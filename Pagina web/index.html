@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>OLC1 Proyecto2</title>
+        <link rel = "stylesheet" type = "text/css" href = "layout/estilos/index.css"/>
+        <script src="layout/logica/index.js"></script>
+    </head>
+    <body id = "cuerpo">
+        <nav id = "menu" >
+            <ul>
+                <li><a>Menu</a>
+                    <ul>
+                        <li>
+                            <input 
+                            id = "filedialog" accept = ".java" type = "file" 
+                            onchange = "abrirArchivo(this.files)" class = "btnp">
+                        </li>
+                        <li><a onclick="agregar()">Nuevo</a></li>
+                        <li><a>Guardar</a></li>
+                        <li><a>Guardar como</a></li>
+                    </ul>
+                </li>
+                <li><a>Descargar</a>
+                    <ul>
+                        <li><a>Ambos</a></li>
+                        <li><a>JavaScript</a></li>
+                        <li><a>Python</a></li>
+                    </ul>
+                </li>
+                <li><a>Traducir</a></li>
+                <li><a>Carnet: 201700965</a></li>
+            </ul>
+        </nav>
+        <textarea id = "entrada" cols = "115" rows = "51"
+        placeholder="Cargue un archivo para traducir"></textarea>
+        <div id="contenedorConsolas">
+        <textarea id = "consolaPython" cols = "116" rows = "25"
+        placeholder="Consola de salida de Python"></textarea>
+        <textarea id = "consolaJS" cols = "116" rows = "25"
+        placeholder="Consola de salida de JavaScript"></textarea>
+        </div>
+    </body>  
+</html>

@@ -1,0 +1,28 @@
+* dudas:
+	no tiene que tener unn boton para traducir ?
+	las tabs para traducir varios se crean infintas o hay un numero definido
+	el guardar y guardar como son sobre java
+	todo viene encerrado en un una clase o pueden venir metodos, declaraciones y asignaciones afuera.
+	pueden venir clases dentro de clases
+	clases seguidas de clases
+	se pueden crear objetos 
+	el public de los metodos y clases es obligatorio ?
+	que hacer con las interfaces de java a js
+	como es lo de los metodos en js
+
+* aclaraciones: 
+	las peticiones se manejan con golang no con js
+	logica de funcionamiento se hace con golang
+	el guardar y guardar como es sobre java
+	son tabs ilimitados
+	boton para traducir
+	las consolas son solo para errores lexicos y sintacticos de cada uno
+	funciones dentro de otras no
+	listado de clases e interfaces
+	no vienen subclases
+	todo viene entre clases
+	siempre viene public en los metodos, clases e interfaces
+	las interfaces se obvian en js
+	si se traduce el comentario
+	var como js
+	los metodos se traducen como function igual
