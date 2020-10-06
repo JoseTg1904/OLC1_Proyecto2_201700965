@@ -20,7 +20,6 @@ function abrirArchivo(archivos){
 }
 
 function traducirAPython(){
-    console.log("simon")
     fetch("http://localhost:3000/traducirPython", {
         method: 'POST',
         mode: 'cors',

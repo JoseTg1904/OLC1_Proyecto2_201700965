@@ -1,0 +1,154 @@
+<Inicio> ::= <PublicoInterClas>
+
+<PublicoInterClas> ::= public <InterClas> 
+                     | epsilon
+
+<InterClas> ::= interface identificador { <Definicion> } <PublicoInterClas> 
+              | class identificador { <Instrucciones> } <PublicoInterClas>
+
+--------------------------------------bloque de interfaces--------------------------------------------- 
+
+<Definicion> ::= public <TipoFuncion> identificador ( <Parametros> ) ; <Definicion> 
+               | epsilon
+
+<TipoFuncion> ::= <Tipo> 
+                | void
+
+<Tipo> ::= int 
+         | boolean 
+         | double 
+         | string 
+         | char
+
+<Parametros> ::= <Tipo> identificador <ListadoParametros>
+               | epsilon
+               
+<ListadoParametros> ::= , <Parametros> 
+                      | epsilon
+
+-------------------------------------------------------------------------------------------------------------
+
+-------------------------------------------bloque de clases--------------------------------------------------
+
+
+<Instrucciones> ::= <Declaracion> <Instrucciones>
+                  | <Implementacion> <Instrucciones>
+                  | epsilon
+
+<Declaracion> ::= <Tipo> <IdentificadorDeclaracion> ;
+
+<IdentificadorDeclaracion> ::= identificador <ListadoDeclaracion>
+
+<ListadoDeclaracion> ::= epsilon 
+                       | = <expresion> <ListadoDeclaracion> 
+                       | , <IdentificadorDeclaracion>
+
+<expresion> ::= <expresion> + <expresion>  
+              | <expresion> - <expresion> 
+              | <expresion> * <expresion>
+              | <expresion> / <expresion> 
+              | - <expresion> 
+              | <expresion> > <expresion> 
+              | <expresion> < <expresion>
+              | <expresion> >= <expresion> 
+              | <expresion> <= <expresion> 
+              | <expresion> == <expresion>
+              | <expresion> != <expresion> 
+              | ! <expresion> 
+              | <expresion> && <expresion> 
+              | <expresion> || <expresion> 
+              | <expresion> ^ <expresion> 
+              | <expresion> ++
+              | <expresion> --
+              | string 
+              | char 
+              | entero 
+              | decimal 
+              | identificador 
+              | true 
+              | false 
+              | ( <expresion> )
+
+----------------------------------expresion sin recursividad------------------------
+
+<expresion> ::= - <expresion> <expresionPrima>
+              | ! <expresion> <expresionPrima>
+              | string <expresionPrima>
+              | char <expresionPrima>
+              | entero <expresionPrima>
+              | decimal <expresionPrima>
+              | identificador <expresionPrima>
+              | true <expresionPrima>
+              | false <expresionPrima>
+              | ( <expresion> ) <expresionPrima>
+
+<expresionPrima> ::= && <expresion> <expresionPrima>
+                   | || <expresion> <expresionPrima>
+                   | ^ <expresion> <expresionPrima>
+                   | ++ <expresionPrima>
+                   | -- <expresionPrima>
+                   | > <expresion> <expresionPrima>
+                   | < <expresion> <expresionPrima>
+                   | >= <expresion> <expresionPrima>
+                   | <= <expresion> <expresionPrima>
+                   | == <expresion> <expresionPrima>
+                   | != <expresion> <expresionPrima>
+                   | + <expresion> <expresionPrima>
+                   | - <expresion> <expresionPrima>
+                   | * <expresion> <expresionPrima>
+                   | / <expresion> <expresionPrima> 
+                   | epsilon
+-------------------------------------------------------------------------------------
+
+<Implementacion> ::= public <divTipoFuncion>
+
+<divTipoFuncion> ::= <TipoFuncion> identificador ( <Parametros> ) { <interno> }
+                   | static void main string ( [ ] args ) { <interno> }
+
+<interno> ::= <Declaracion> <interno>
+            | <LlamadoAsignacion> <interno>
+            | system . out . <divPrint> <interno>
+            | for ( <DeclaracionFor> ; <expresion> ; <expresion> ) { <internoCiclo> } <interno>
+            | while ( <expresion> ) { <internoCiclo> } <interno>
+            | do { <internoCiclo> } while ( <expresion> ) ; <interno>
+            | if ( <expresion> ) { <interno> } <ifElse> <interno>
+            | return <tipoReturn> ; <interno>
+            | epsilon 
+
+<tipoReturn> ::= epsilon
+               | <expresion>
+
+<ifElse> ::= else <comprobacionElif>
+           | epsilon
+
+<comprobacionElif> ::= { <interno> }
+                     | if ( <expresion> ) { <interno> } <ifElse>
+
+<divPrint> ::= print ( <expresion> ) ; 
+             | println ( <expresion> ) ;
+
+<internoCiclo> ::= <interno>
+                 | break
+                 | continue
+
+<ParametrosLlamado> ::= identificador <ListadoDeclaracionParametrosLlamado> 
+                      | entero <ListadoDeclaracionParametrosLlamado> 
+                      | decimal <ListadoDeclaracionParametrosLlamado> 
+                      | true <ListadoDeclaracionParametrosLlamado> 
+                      | false <ListadoDeclaracionParametrosLlamado>
+                      | string <ListadoDeclaracionParametrosLlamado> 
+                      | char <ListadoDeclaracionParametrosLlamado> 
+
+<ListadoDeclaracionParametrosLlamado> ::= epsilon
+                                        | , <ParametrosLlamado>
+
+<LlamadoAsignacion> ::= identificador <divLlamadoAsignacion>
+
+<divLlamadoAsignacion> ::= ( <ParametrosLlamado> ) ;
+                         | = <expresion> ;
+
+<DeclaracionFor> ::=  <Tipo> <IdentificadorDeclaracionFor>
+
+<IdentificadorDeclaracionFor> ::= identificador = <expresion> 
+
+-----------------------------------------------------------------------------------------------------------------
