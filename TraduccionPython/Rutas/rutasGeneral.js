@@ -8,11 +8,20 @@ var listaTokens = [];
 var listadoErroresLexicos = [];
 var listadoErroresSintacticos = [];
 var traducido = "";
+var tabulados = "";
+var especial = "";
 var tokenActual;
 var iteradorSintactico = 0;
+var banderaSalto = false;
 
 router.post("/traducirPython", (req, res) => {
     analizadorLexico(req.body.contenido);
+    /*res.json({
+        erroresLexicos: listadoErroresLexicos,
+        erroresSintacticos: listadoErroresSintacticos,
+        traduccion: traducido,
+        arbol: ""
+    })*/
 })
 
 function analizadorLexico(contenidoArchivo){
@@ -188,10 +197,8 @@ function analizadorLexico(contenidoArchivo){
             case 9:
                 if (caracter == "/"){
                     estado = 10
-                    lexemaAuxiliar = "//"
                 }else if (caracter == "*"){
                     estado = 11
-                    lexemaAuxiliar = "/*"
                 }else{
                     estado = 0
                     listaTokens.push({tipo: "tk_division", valor: "/"})
@@ -201,7 +208,6 @@ function analizadorLexico(contenidoArchivo){
             case 10:
                 if (caracter == "\n"){
                     etado = 0
-                    lexemaAuxiliar += caracter
                     listaTokens.push({tipo: "tk_comentarioIndividual", valor: lexemaAuxiliar})
                     lexemaAuxiliar = ""
                 }else{
@@ -221,6 +227,7 @@ function analizadorLexico(contenidoArchivo){
             case 12:
                 if (caracter == "/"){
                     estado = 0
+                    lexemaAuxiliar = lexemaAuxiliar.substring(0, lexemaAuxiliar.length - 2)
                     listaTokens.push({tipo: "tk_comentarioMultiple", valor: lexemaAuxiliar})
                     lexemaAuxiliar = ""
                 }else{
@@ -434,11 +441,16 @@ function analizadorLexico(contenidoArchivo){
     }
 
     analizadorSintactico();
+    traducido = traducido.replace("  ", " ")
+    console.log(traducido)
 }
 
 function analizadorSintactico(){
+    listadoErroresSintacticos = [];
     iteradorSintactico = 0;
     tokenActual = listaTokens[iteradorSintactico];
+    traducido = ""
+    tabulados = ""
     publicoInterClass()
     for(let i =  0; i < listadoErroresSintacticos.length; i++){
         console.log("esperado",listadoErroresSintacticos[i].esperado,"encontrado" , listadoErroresSintacticos[i].encontrado)
@@ -447,82 +459,82 @@ function analizadorSintactico(){
 
 function publicoInterClass(){
     if (tokenActual.tipo == "tk_public"){
-        parea("tk_public", "tk_public")
+        parea("tk_public", "tk_public", "")
         interClass()
     }
 }
 
 function interClass(){
     if(tokenActual.tipo == "tk_interface"){
-        parea("tk_interface", "tk_interface")
-        parea("tk_identificador", "tk_identificador")
-        parea("tk_llaveA", "tk_llaveA")
+        parea("tk_interface", "tk_interface", "")
+        parea("tk_identificador", "tk_identificador", "")
+        parea("tk_llaveA", "tk_llaveA", "")
         definicion()
-        parea("tk_llaveC", "tk_llaveC")
+        parea("tk_llaveC", "tk_llaveC", "")
         publicoInterClass()
     }else if(tokenActual.tipo == "tk_class"){
-        parea("tk_class", "tk_class")
-        parea("tk_identificador", "tk_identificador")
-        parea("tk_llaveA", "tk_llaveA")
+        parea("tk_class", "tk_class", "")
+        parea("tk_identificador", "tk_identificador", "")
+        parea("tk_llaveA", "tk_llaveA", "")
         instrucciones()
-        parea("tk_llaveC", "tk_llaveC")
+        parea("tk_llaveC", "tk_llaveC", "")
         publicoInterClass()
     }else{
-        parea("tk_error", "tk_interface | tk_clase")
+        parea("tk_error", "tk_interface | tk_clase", "")
     }
 }
 
 function definicion(){
     if (tokenActual.tipo == "tk_public"){
-        parea("tk_public", "tk_public")
-        tipoFuncion()
-        parea("tk_identificador", "tk_identificador")
-        parea("tk_parA", "tk_parA")
-        parametros()
-        parea("tk_parC", "tk_parC")
-        parea("tk_puntoComa", "tk_puntoComa")
+        parea("tk_public", "tk_public", "definicion")
+        tipoFuncion("definicion")
+        parea("tk_identificador", "tk_identificador", "definicion")
+        parea("tk_parA", "tk_parA", "definicion")
+        parametros("definicion")
+        parea("tk_parC", "tk_parC", "definicion")
+        parea("tk_puntoComa", "tk_puntoComa", "definicion")
         definicion()
     }
 }
 
-function tipoFuncion(){
+function tipoFuncion(contexto){
     if (tokenActual.tipo == "tk_void"){
-        parea("tk_void", "tk_void")
+        parea("tk_void", "tk_void", contexto)
     }else{
-        tipo()
+        tipo(contexto)
     }
 }
 
-function tipo(){
+function tipo(contexto){
     if(tokenActual.tipo == "tk_int"){
-        parea("tk_int", "tk_int")
+        parea("tk_int", "tk_int", contexto)
     }else if(tokenActual.tipo == "tk_boolean"){
-        parea("tk_boolean", "tk_boolean")
+        parea("tk_boolean", "tk_boolean", contexto)
     }else if(tokenActual.tipo == "tk_double"){
-        parea("tk_double", "tk_double")
+        parea("tk_double", "tk_double", contexto)
     }else if(tokenActual.tipo == "tk_string"){
-        parea("tk_string", "tk_string")
+        parea("tk_string", "tk_string", contexto)
     }else if(tokenActual.tipo == "tk_char"){
-        parea("tk_char", "tk_char")
+        parea("tk_char", "tk_char", contexto)
     }else{
-        parea("tk_error", "tk_tipo")
+        parea("tk_error", "tk_tipo", "")
     }
 }
 
-function parametros(){
+function parametros(contexto){
     if (tokenActual.tipo == "tk_int" || tokenActual.tipo == "tk_boolean" 
     || tokenActual.tipo == "tk_double" || tokenActual.tipo == "tk_string" 
     || tokenActual.tipo == "tk_char"){
-        tipo()
-        parea("tk_identificador", "tk_identificador")
-        listadoParametros()        
+        tipo(contexto)
+        parea("tk_identificador", "tk_identificador", contexto)
+        listadoParametros(contexto)        
     }
 }
 
-function listadoParametros(){
+function listadoParametros(contexto){
     if (tokenActual.tipo == "tk_coma"){
-        parea("tk_coma", "tk_coma")
-        parametros()
+        parea("tk_coma", "tk_coma", contexto)
+        parametros(contexto)
     }
 }
 
@@ -530,58 +542,92 @@ function instrucciones(){
     if(tokenActual.tipo == "tk_int" || tokenActual.tipo == "tk_boolean" 
     || tokenActual.tipo == "tk_double" || tokenActual.tipo == "tk_string" 
     || tokenActual.tipo == "tk_char"){
-        declaracion()
+        declaracion("declaracion")
+        instrucciones()
     }else if(tokenActual.tipo == "tk_public"){
         implementacion()
+        instrucciones()
     }
 }
 
-function declaracion(){
-    tipo()
-    identificadorDeclaracion()
-    parea("tk_puntoComa", "tk_puntoComa")
-    instrucciones()
+function declaracion(contexto){
+    tipo(contexto)
+    identificadorDeclaracion(contexto)
+    parea("tk_puntoComa", "tk_puntoComa", contexto)
+}
+
+function identificadorDeclaracion(contexto){
+    if(tokenActual.tipo == "tk_identificador"){
+        parea("tk_identificador", "tk_identificador", contexto)
+        listadoDeclaracion(contexto)
+    }else{
+        parea("tk_error", "tk_identificador", "")
+    }
+}
+
+function listadoDeclaracion(contexto){
+    if(tokenActual.tipo == "tk_igual"){
+        parea("tk_igual", "tk_igual", contexto)
+        expresion()
+        listadoDeclaracion(contexto)
+    }else if (tokenActual.tipo == "tk_coma"){
+        parea("tk_coma", "tk_coma", contexto)
+        identificadorDeclaracion(contexto)
+    }
 }
 
 function implementacion(){
-    parea("tk_public", "tk_public")
-    divTipoFuncion()
-    parea("tk_puntoComa", "tk_puntoComa")
-    instrucciones()
-}
-
-function divTipoFuncion(){
-    if(tokenActual.tipo == "tk_static"){
-        parea("tk_static", "tk_static")
-        parea("tk_void", "tk_void")
-        parea("tk_main", "tk_main")
-        parea("tk_string", "tk_string")
-        parea("tk_parA", "tk_parA")
-        parea("tk_corcheteA", "tk_corcheteA")
-        parea("tk_corcheteC", "tk_corcheteC")
-        parea("tk_args", "tk_args")
-        parea("tk_parC", "tk_parC")
-        parea("tk_llaveA", "tk_llaveA")
-        interno()
-        parea("tk_llaveC", "tk_llaveC")
+    if(tokenActual.tipo == "tk_public"){
+        contextoActual = "implementacion"
+        if (iteradorSintactico + 1 < listaTokens.length){
+            if(listaTokens[iteradorSintactico+1].tipo == "tk_static"){
+                contextoActual = "main"
+            }
+        }
+        parea("tk_public", "tk_public", contextoActual)
+        divTipoFuncion("implementacion")
     }else{
-        tipoFuncion()
-        parea("tk_identificador", "tk_identificador")
-        parea("tk_parA", "tk_parA")
-        parametros()
-        parea("tk_parC", "tk_parC")
-        parea("tk_llaveA", "tk_llaveA")
-        interno()
-        parea("tk_llaveC", "tk_llaveC")
+        parea("tk_error", "tk_public", "")
     }
 }
 
+function divTipoFuncion(contexto){
+    if(tokenActual.tipo == "tk_static"){
+        parea("tk_static", "tk_static", "main")
+        parea("tk_void", "tk_void", "main")
+        parea("tk_main", "tk_main", "main")
+        parea("tk_parA", "tk_parA", "main")
+        parea("tk_string", "tk_string", "main")
+        parea("tk_corcheteA", "tk_corcheteA", "main")
+        parea("tk_corcheteC", "tk_corcheteC", "main")
+        parea("tk_args", "tk_args", "main")
+        parea("tk_parC", "tk_parC", "main")
+        parea("tk_llaveA", "tk_llaveA", "main")
+        interno()
+        parea("tk_llaveC", "tk_llaveC", "main")
+    }else if (tokenActual.tipo == "tk_int" || tokenActual.tipo == "tk_boolean" 
+    || tokenActual.tipo == "tk_double" || tokenActual.tipo == "tk_string" 
+    || tokenActual.tipo == "tk_char" || tokenActual.tipo == "tk_void"){
+        tipoFuncion(contexto)
+        parea("tk_identificador", "tk_identificador", contexto)
+        parea("tk_parA", "tk_parA", contexto)
+        parametros(contexto)
+        parea("tk_parC", "tk_parC", contexto)
+        parea("tk_llaveA", "tk_llaveA", contexto)
+        interno()
+        parea("tk_llaveC", "tk_llaveC", contexto)
+    }else{
+        parea("tk_error", "tk_static | tk_tipo", "")
+    }
+}
+
+//traducir desde el for en adelante
 function interno(){
     if(tokenActual.tipo == "tk_system"){
-        parea("tk_system", "tk_system")
-        parea("tk_punto", "tk_punto")
-        parea("tk_out", "tk_out")
-        parea("tk_punto", "tk_punto")
+        parea("tk_system", "tk_system", "print")
+        parea("tk_punto", "tk_punto", "print")
+        parea("tk_out", "tk_out", "print")
+        parea("tk_punto", "tk_punto", "print")
         divPrint()
         interno()
     }else if(tokenActual.tipo == "tk_for"){
@@ -644,6 +690,25 @@ function interno(){
     }
 }
 
+function divPrint(){
+    if(tokenActual.tipo == "tk_print"){
+        parea("tk_print", "tk_print", "print")
+        parea("tk_parA", "tk_parA", "print")
+        expresion()
+        parea("tk_parC", "tk_parC", "print")
+        parea("tk_puntoComa", "tk_puntoComa", "print")
+    }else if(tokenActual.tipo == "tk_println"){
+        parea("tk_println", "tk_println", "print")
+        parea("tk_parA", "tk_parA", "print")
+        expresion()
+        parea("tk_parC", "tk_parC", "print")
+        parea("tk_puntoComa", "tk_puntoComa", "print")
+    }else{
+        parea("tk_error", "tk_print")
+    }
+}
+
+/*
 function parametrosLlamada(){
     if(tokenActual.tipo == "tk_identificador"){
         parea("tk_identificador", "tk_identificador")
@@ -678,23 +743,7 @@ function listadoDeclaracionParametrosLlamado(){
     }
 }
 
-function divPrint(){
-    if(tokenActual.tipo == "tk_print"){
-        parea("tk_print", "tk_print")
-        parea("tk_parA", "tk_parA")
-        expresion()
-        parea("tk_parC", "tk_parC")
-        parea("tk_puntoComa", "tk_puntoComa")
-    }else if(tokenActual.tipo == "tk_println"){
-        parea("tk_println", "tk_println")
-        parea("tk_parA", "tk_parA")
-        expresion()
-        parea("tk_parC", "tk_parC")
-        parea("tk_puntoComa", "tk_puntoComa")
-    }else{
-        parea("tk_erorr", "tk_print")
-    }
-}
+
 
 function divLlamadoAsignacion(){
     if (tokenActual.tipo == "tk_parA"){
@@ -786,116 +835,114 @@ function identificadorDeclaracionFor(){
         parea("tk_error", "tk_identificador")
     }
 }
-
-function identificadorDeclaracion(){
-    if(tokenActual.tipo == "tk_identificador"){
-        parea("tk_identificador", "tk_identificador")
-        listadoDeclaracion()
-    }else{
-        parea("tk_error", "tk_identificador")
-    }
-}
-
-function listadoDeclaracion(){
-    if(tokenActual.tipo == "tk_igual"){
-        parea("tk_igual", "tk_igual")
-        expresion()
-        listadoDeclaracion()
-    }else if (tokenActual.tipo == "tk_coma"){
-        parea("tk_coma", "tk_coma")
-        identificadorDeclaracion()
-    }
-}
+*/
 
 function expresion(){
     if(tokenActual.tipo == "tk_menos"){
-        parea("tk_menos", "tk_menos")
+        parea("tk_menos", "tk_menos", "expresion")
         expresion()
         expresionPrima()
     }else if(tokenActual.tipo == "tk_not"){
-        parea("tk_not", "tk_not")
+        parea("tk_not", "tk_not", "expresion")
         expresion()
         expresionPrima()
     }else if(tokenActual.tipo == "tk_stringTexto"){
-        parea("tk_stringTexto", "tk_stringTexto")
+        parea("tk_stringTexto", "tk_stringTexto", "expresion")
         expresionPrima()
     }else if(tokenActual.tipo == "tk_charTexto"){
-        parea("tk_charTexto", "tk_charTexto")
+        parea("tk_charTexto", "tk_charTexto", "expresion")
         expresionPrima()
     }else if(tokenActual.tipo == "tk_numero"){
-        parea("tk_numero", "tk_numero")
+        parea("tk_numero", "tk_numero", "expresion")
         expresionPrima()
     }else if(tokenActual.tipo == "tk_decimal"){
-        parea("tk_decimal", "tk_decimal")
+        parea("tk_decimal", "tk_decimal", "expresion")
         expresionPrima()
     }else if(tokenActual.tipo == "tk_identificador"){
-        parea("tk_identificador", "tk_identificador")
+        parea("tk_identificador", "tk_identificador", "expresion")
         expresionPrima()
     }else if(tokenActual.tipo == "tk_true"){
-        parea("tk_true", "tk_true")
+        parea("tk_true", "tk_true", "expresion")
         expresionPrima()
     }else if(tokenActual.tipo == "tk_false"){
-        parea("tk_false", "tk_false")
+        parea("tk_false", "tk_false", "expresion")
         expresionPrima()
     }else if(tokenActual.tipo == "tk_parA"){
-        parea("tk_parA", "tk_parA")
+        parea("tk_parA", "tk_parA", "expresion")
         expresion()
-        parea("tk_parC", "tk_parC")
+        parea("tk_parC", "tk_parC", "expresion")
+        expresionPrima()
     }else{
-        parea("tk_error", "tk_expresion")
+        parea("tk_error", "tk_expresion", "")
     }
 }
 
 function expresionPrima(){
     if(tokenActual.tipo == "tk_and"){
+        parea("tk_and", "tk_and", "expresion")
         expresion()
         expresionPrima()
     }else if(tokenActual.tipo == "tk_or"){
+        parea("tk_or", "tk_or", "expresion")
         expresion()
         expresionPrima()
     }else if(tokenActual.tipo == "tk_xor"){
+        parea("tk_xor", "tk_xor", "expresion")
         expresion()
         expresionPrima()
     }else if(tokenActual.tipo == "tk_adicion"){
+        parea("tk_adicion", "tk_adicion", "expresion")
         expresionPrima()
     }else if(tokenActual.tipo == "tk_sustraccion"){
+        parea("tk_sustraccion", "tk_sustraccion", "expresion")
         expresionPrima()
     }else if(tokenActual.tipo == "tk_mayor"){
+        parea("tk_mayor", "tk_mayor", "expresion")
         expresion()
         expresionPrima()
     }else if(tokenActual.tipo == "tk_menor"){
+        parea("tk_menor", "tk_menor", "expresion")
         expresion()
         expresionPrima()
     }else if(tokenActual.tipo == "tk_mayorIgual"){
+        parea("tk_mayorIgual", "tk_mayorIgual", "expresion")
         expresion()
         expresionPrima()
     }else if(tokenActual.tipo == "tk_menorIgual"){
+        parea("tk_menorIgual", "tk_menorIgual", "expresion")
         expresion()
         expresionPrima()
     }else if(tokenActual.tipo == "tk_igualacion"){
+        parea("tk_igualacion", "tk_igualacion", "expresion")
         expresion()
         expresionPrima()
     }else if(tokenActual.tipo == "tk_distinto"){
+        parea("tk_distinto", "tk_distinto", "expresion")
         expresion()
         expresionPrima()
     }else if(tokenActual.tipo == "tk_mas"){
+        parea("tk_mas", "tk_mas", "expresion")
         expresion()
         expresionPrima()
     }else if(tokenActual.tipo == "tk_menos"){
+        parea("tk_menos", "tk_menos", "expresion")
         expresion()
         expresionPrima()
     }else if(tokenActual.tipo == "tk_por"){
+        parea("tk_por", "tk_por", "expresion")
         expresion()
         expresionPrima()
     }else if(tokenActual.tipo == "tk_division"){
+        parea("tk_division", "tk_division", "expresion")
         expresion()
         expresionPrima()
     }
 }
 
-function parea(preAnalisis, esperado){
+function parea(preAnalisis, esperado, contexto){
     if (preAnalisis == tokenActual.tipo){
         console.log(preAnalisis)
+        traduccion(tokenActual, contexto)
         iteradorSintactico++
         if (iteradorSintactico < listaTokens.length){
             tokenActual = listaTokens[iteradorSintactico]
@@ -905,6 +952,159 @@ function parea(preAnalisis, esperado){
         listadoErroresSintacticos.push({encontrado: tokenActual.tipo, esperado: esperado})
         //aqui va el error+
         //y la consumida de tokens hasta encontrar un ; 
+    }
+}
+
+function traduccion(tokenTraducir, contexto){
+    if (contexto == ""){
+        if(tokenTraducir.tipo == "tk_class"){
+            traducido += "class "
+        }else if(tokenTraducir.tipo == "tk_interface"){
+            traducido += "class "
+        }else if(tokenTraducir.tipo == "tk_llaveA"){
+            traducido += ":\n"
+            tabulados += "\t"
+        }else if(tokenTraducir.tipo == "tk_llaveC"){
+            tabulados = tabulados.substring(0, tabulados.length - 1)
+            traducido += "\n"
+        }else if(tokenTraducir.tipo == "tk_identificador"){
+            traducido += tokenTraducir.valor
+        }
+    }else if(contexto == "definicion"){
+        if (tokenTraducir.tipo == "tk_public"){
+            traducido += tabulados + "self "
+        }else if(tokenTraducir.tipo == "tk_identificador"){
+            traducido += tokenTraducir.valor
+        }else if(tokenTraducir.tipo == "tk_parA"){
+            traducido += "("
+        }else if(tokenTraducir.tipo == "tk_parC"){
+            traducido += ")"
+        }else if(tokenTraducir.tipo == "tk_puntoComa"){
+            traducido += ";\n"
+        }else if(tokenTraducir.tipo == "tk_coma")
+            traducido += ", "
+    }else if(contexto == "declaracion"){
+        if(tokenTraducir.tipo == "tk_int" || tokenTraducir.tipo == "tk_boolean" 
+        || tokenTraducir.tipo == "tk_double" || tokenTraducir.tipo == "tk_string" 
+        || tokenTraducir.tipo == "tk_char"){
+            traducido += tabulados + "var "
+        }else if(tokenTraducir.tipo == "tk_identificador"){
+            traducido += tokenTraducir.valor
+        }else if(tokenTraducir.tipo == "tk_coma"){
+            traducido += ", "
+        }else if(tokenTraducir.tipo == "tk_puntoComa"){
+            traducido += "\n"
+        }else if(tokenTraducir.tipo == "tk_igual"){
+            traducido += " = "
+        }
+    }else if(contexto == "expresion"){
+        if(tokenTraducir.tipo == "tk_menos"){
+            traducido += " - "
+        }else if(tokenTraducir.tipo == "tk_not"){
+            traducido += " not "
+        }else if(tokenTraducir.tipo == "tk_stringTexto"){
+            traducido += tokenTraducir.valor
+        }else if(tokenTraducir.tipo == "tk_charTexto"){
+            traducido += tokenTraducir.valor
+        }else if(tokenTraducir.tipo == "tk_numero"){
+            traducido += tokenTraducir.valor
+        }else if(tokenTraducir.tipo == "tk_decimal"){
+            traducido += tokenTraducir.valor
+        }else if(tokenTraducir.tipo == "tk_identificador"){
+            traducido += tokenTraducir.valor
+        }else if(tokenTraducir.tipo == "tk_true"){
+            traducido += " True "
+        }else if(tokenTraducir.tipo == "tk_false"){
+            traducido += " False "
+        }else if(tokenTraducir.tipo == "tk_parA"){
+            traducido += "("
+        }else if(tokenTraducir.tipo == "tk_parC"){
+            traducido += ")"
+        }else if(tokenTraducir.tipo == "tk_and"){
+            traducido += " and "    
+        }else if(tokenTraducir.tipo == "tk_or"){
+            traducido += " or " 
+        }else if(tokenTraducir.tipo == "tk_xor"){
+            traducido += " xor "
+        }else if(tokenTraducir.tipo == "tk_adicion"){
+            traducido += " += "
+        }else if(tokenTraducir.tipo == "tk_sustraccion"){
+            traducido += " -= "
+        }else if(tokenTraducir.tipo == "tk_mayor"){
+            traducido += " > "
+        }else if(tokenTraducir.tipo == "tk_menor"){
+            traducido += " < "
+        }else if(tokenTraducir.tipo == "tk_mayorIgual"){
+            traducido += " >= "
+        }else if(tokenTraducir.tipo == "tk_menorIgual"){
+            traducido += " <= "
+        }else if(tokenTraducir.tipo == "tk_igualacion"){
+            traducido += " == "
+        }else if(tokenTraducir.tipo == "tk_distinto"){
+            traducido += " != "
+        }else if(tokenTraducir.tipo == "tk_mas"){
+            traducido += " + "
+        }else if(tokenTraducir.tipo == "tk_por"){
+            traducido += " * "
+        }else if(tokenTraducir.tipo == "tk_division"){
+            traducido += " / "
+        }        
+    }else if(contexto == "implementacion"){
+        if(tokenTraducir.tipo == "tk_public"){
+            if (especial == "")
+            traducido += tabulados + "def "
+        }else if(tokenTraducir.tipo == "tk_identificador"){
+            traducido += tokenTraducir.valor
+        }else if(tokenTraducir.tipo == "tk_llaveA"){
+            traducido += ":\n"
+            tabulados += "\t"
+        }else if(tokenTraducir.tipo == "tk_llaveC"){
+            tabulados = tabulados.substring(0, tabulados.length - 1)
+            traducido += "\n"
+        }else if(tokenTraducir.tipo == "tk_parA"){
+            traducido += "("
+        }else if(tokenTraducir.tipo == "tk_parC"){
+            traducido += ")"
+        }else if(tokenTraducir.tipo == "tk_coma"){
+            traducido += ", "
+        }
+    }else if(contexto == "main"){
+        especial += tokenTraducir.valor
+        if (tokenTraducir.tipo == "tk_llaveA"){
+            especial = ""
+            traducido += ":\n"
+            tabulados += "\t"
+        }else if(tokenTraducir.tipo == "tk_llaveC"){
+            especial = ""
+            tabulados = tabulados.substring(0, tabulados.length - 1)
+            traducido += "\n"
+        }else if(especial.toLowerCase() == "publicstaticvoidmain(string[]args)"){
+            especial = ""
+            traducido += "\tif __name__ = \"__main__\":\n\t\tmain()\n\n"
+            traducido += "\tdef main()"
+        }   
+    }else if(contexto == "print"){
+        especial += tokenTraducir.valor
+        if(tokenTraducir.tipo == "tk_parA"){
+            especial = ""
+            traducido += "("
+        }else if(tokenTraducir.tipo == "tk_parC"){
+            especial = ""
+            if(banderaSalto == false){
+                traducido += ", end = \"\""
+            }
+            traducido += ")\n"
+        }else if(especial.toLowerCase() == "system.out.print"){
+            banderaSalto = false;
+            especial = ""
+            traducido += tabulados + "print"
+        }else if(especial.toLowerCase() == "system.out.println"){
+            banderaSalto = true;
+            especial = ""
+            traducido += tabulados + "print"
+        }else if(tokenTraducir.tipo == "tk_puntoComa"){
+            especial = ""
+        }
     }
 }
 

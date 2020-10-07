@@ -103,7 +103,7 @@
 <Implementacion> ::= public <divTipoFuncion>
 
 <divTipoFuncion> ::= <TipoFuncion> identificador ( <Parametros> ) { <interno> }
-                   | static void main string ( [ ] args ) { <interno> }
+                   | static void main ( string [ ] args ) { <interno> }
 
 <interno> ::= <Declaracion> <interno>
             | <LlamadoAsignacion> <interno>
