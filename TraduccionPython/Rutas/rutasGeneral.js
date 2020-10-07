@@ -442,6 +442,7 @@ function analizadorLexico(contenidoArchivo){
 
     analizadorSintactico();
     traducido = traducido.replace("  ", " ")
+    traducido = traducido.replace("\n\n", "\n")
     console.log(traducido)
 }
 
@@ -452,9 +453,6 @@ function analizadorSintactico(){
     traducido = ""
     tabulados = ""
     publicoInterClass()
-    for(let i =  0; i < listadoErroresSintacticos.length; i++){
-        console.log("esperado",listadoErroresSintacticos[i].esperado,"encontrado" , listadoErroresSintacticos[i].encontrado)
-    }
 }
 
 function publicoInterClass(){
@@ -621,7 +619,7 @@ function divTipoFuncion(contexto){
     }
 }
 
-//traducir desde el for en adelante
+//esta pendiente el for
 function interno(){
     if(tokenActual.tipo == "tk_system"){
         parea("tk_system", "tk_system", "print")
@@ -644,39 +642,39 @@ function interno(){
         parea("tk_llaveC")
         interno()
     }else if(tokenActual.tipo == "tk_while"){
-        parea("tk_while", "tk_while")
-        parea("tk_parA", "tk_parA")
+        parea("tk_while", "tk_while", "while")
+        parea("tk_parA", "tk_parA", "while")
         expresion()
-        parea("tk_parC", "tk_parC")
-        parea("tk_llaveA", "tk_llaveA")
+        parea("tk_parC", "tk_parC", "while")
+        parea("tk_llaveA", "tk_llaveA", "while")
         internoCiclo()
-        parea("tk_llaveC", "tk_llaveC")
+        parea("tk_llaveC", "tk_llaveC", "while")
         interno()
     }else if(tokenActual.tipo == "tk_do"){
-        parea("tk_do", "tk_do")
-        parea("tk_llaveA", "tk_llaveA")
+        parea("tk_do", "tk_do", "dowhile")
+        parea("tk_llaveA", "tk_llaveA", "dowhile")
         internoCiclo()
-        parea("tk_llaveC", "tk_llaveC")
-        parea("tk_while", "tk_while")
-        parea("tk_parA", "tk_parA")
+        parea("tk_llaveC", "tk_llaveC", "dowhile")
+        parea("tk_while", "tk_while", "dowhile")
+        parea("tk_parA", "tk_parA", "dowhile")
         expresion()
-        parea("tk_parC", "tk_parC")
-        parea("tk_puntoComa", "tk_puntoComa")
+        parea("tk_parC", "tk_parC", "dowhile")
+        parea("tk_puntoComa", "tk_puntoComa", "dowhile")
         interno()
     }else if(tokenActual.tipo == "tk_if"){
-        parea("tk_if", "tk_if")
-        parea("tk_parA", "tk_parA")
+        parea("tk_if", "tk_if", "if")
+        parea("tk_parA", "tk_parA", "if")
         expresion()
-        parea("tk_parC", "tk_parC")
-        parea("tk_llaveA", "tk_llaveA")
+        parea("tk_parC", "tk_parC", "if")
+        parea("tk_llaveA", "tk_llaveA", "if")
         interno()
-        parea("tk_llaveC", "tk_llaveC")
+        parea("tk_llaveC", "tk_llaveC", "if")
         ifElse()
         interno()
     }else if(tokenActual.tipo == "tk_return"){
-        parea("tk_return", "tk_return")
+        parea("tk_return", "tk_return", "return")
         tipoReturn()
-        parea("tk_puntoComa", "tk_puntoComa")
+        parea("tk_puntoComa", "tk_puntoComa", "return")
         interno()
     }else if(tokenActual.tipo == "tk_identificador"){
         llamadoAsignacion()
@@ -684,8 +682,19 @@ function interno(){
     }else if(tokenActual.tipo == "tk_int" || tokenActual.tipo == "tk_boolean" 
     || tokenActual.tipo == "tk_double" || tokenActual.tipo == "tk_string" 
     || tokenActual.tipo == "tk_char"){
-        
-        declaracion()
+        declaracion("declaracion")
+        interno()
+    }
+}
+
+function internoCiclo(){
+    if(tokenActual.tipo == "tk_break"){
+        parea("tk_break", "tk_break", "ciclo")
+        parea("tk_puntoComa", "tk_puntoComa", "ciclo")
+    }else if(tokenActual.tipo == "tk_continue"){
+        parea("tk_continue", "tk_continue", "ciclo")
+        parea("tk_puntoComa", "tk_puntoComa", "ciclo")
+    }else{
         interno()
     }
 }
@@ -708,64 +717,35 @@ function divPrint(){
     }
 }
 
-/*
-function parametrosLlamada(){
-    if(tokenActual.tipo == "tk_identificador"){
-        parea("tk_identificador", "tk_identificador")
-        listadoDeclaracionParametrosLlamado()
-    }else if(tokenActual.tipo == "tk_numero"){
-        parea("tk_numero", "tk_numero")
-        listadoDeclaracionParametrosLlamado()
-    }else if(tokenActual.tipo == "tk_decimal"){
-        parea("tk_decimal", "tk_decimal")
-        listadoDeclaracionParametrosLlamado()
-    }else if(tokenActual.tipo == "tk_true"){
-        parea("tk_true", "tk_true")
-        listadoDeclaracionParametrosLlamado()
-    }else if(tokenActual.tipo == "tk_false"){
-        parea("tk_false", "tk_false")
-        listadoDeclaracionParametrosLlamado()
-    }else if(tokenActual.tipo == "tk_stringTexto"){
-        parea("tk_stringTexto", "tk_stringTexto")
-        listadoDeclaracionParametrosLlamado()
-    }else if(tokenActual.tipo == "tk_charTexto"){
-        parea("tk_charTexto", "tk_charTexto")
-        listadoDeclaracionParametrosLlamado()
-    }else{
-        parea("tk_error", "tk_tipo")
-    }
+function ifElse(){
+    if(tokenActual.tipo == "tk_else"){
+        var contextoActual = "else"
+        if (iteradorSintactico + 1 < listaTokens.length){
+            if(listaTokens[iteradorSintactico+1].tipo == "tk_if"){
+                contextoActual = "elseif"
+            }
+        }
+        parea("tk_else", "tk_else", contextoActual)
+        comprobacionElif()
+    }   
 }
 
-function listadoDeclaracionParametrosLlamado(){
-    if(tokenActual.tipo == "tk_coma"){
-        parea("tk_coma", "tk_coma")
-        parametrosLlamada()
-    }
-}
-
-
-
-function divLlamadoAsignacion(){
-    if (tokenActual.tipo == "tk_parA"){
-        parea("tk_parA", "tk_parA")
-        parametrosLlamada()
-        parea("tk_parC", "tk_parC")
-        parea("tk_puntoComa", "tk_puntoComa")
-    }else if(tokenActual.tipo == "tk_igual"){
-        parea("tk_igual", "tk_igual")
+function comprobacionElif(){
+    if(tokenActual.tipo == "tk_llaveA"){
+        parea("tk_llaveA", "tk_llaveA", "else")
+        interno()
+        parea("tk_llaveC", "tk_llaveC", "else")
+    }else if(tokenActual.tipo == "tk_if"){
+        parea("tk_if", "tk_if", "elseif")
+        parea("tk_parA", "tk_parA", "elseif")
         expresion()
-        parea("tk_puntoComa", "tk_puntoComa")
+        parea("tk_parC", "tk_parC", "elseif")
+        parea("tk_llaveA", "tk_llaveA", "elseif")
+        interno()
+        parea("tk_llaveC", "tk_llaveC", "elseif")
+        ifElse()
     }else{
-        parea("tk_error", "tk_parA | tk_igual")
-    }
-}
-
-function llamadoAsignacion(){
-    if(tokenActual.tipo == "tk_identificador"){
-        parea("tk_identificador", "tk_identificador")
-        divLlamadoAsignacion()    
-    }else{
-        parea("tk_error", "tk_identificador")
+        parea("tk_error", "tk_llave | tk_if")
     }
 }
 
@@ -779,42 +759,65 @@ function tipoReturn(){
     }
 }
 
-function ifElse(){
-    if(tokenActual.tipo == "tk_else"){
-        parea("tk_else", "tk_else")
-        comprobacionElif()
-    }   
+function parametrosLlamada(){
+    if(tokenActual.tipo == "tk_identificador"){
+        parea("tk_identificador", "tk_identificador", "llamado")
+        listadoDeclaracionParametrosLlamado()
+    }else if(tokenActual.tipo == "tk_numero"){
+        parea("tk_numero", "tk_numero", "llamado")
+        listadoDeclaracionParametrosLlamado()
+    }else if(tokenActual.tipo == "tk_decimal"){
+        parea("tk_decimal", "tk_decimal", "llamado")
+        listadoDeclaracionParametrosLlamado()
+    }else if(tokenActual.tipo == "tk_true"){
+        parea("tk_true", "tk_true", "llamado")
+        listadoDeclaracionParametrosLlamado()
+    }else if(tokenActual.tipo == "tk_false"){
+        parea("tk_false", "tk_false", "llamado")
+        listadoDeclaracionParametrosLlamado()
+    }else if(tokenActual.tipo == "tk_stringTexto"){
+        parea("tk_stringTexto", "tk_stringTexto", "llamado")
+        listadoDeclaracionParametrosLlamado()
+    }else if(tokenActual.tipo == "tk_charTexto"){
+        parea("tk_charTexto", "tk_charTexto", "llamado")
+        listadoDeclaracionParametrosLlamado()
+    }else{
+        parea("tk_error", "tk_tipo")
+    }
 }
 
-function comprobacionElif(){
-    if(tokenActual.tipo == "tk_llaveA"){
-        parea("tk_llaveA", "tk_llaveA")
-        interno()
-        parea("tk_llaveC", "tk_llaveC")
-    }else if(tokenActual.tipo == "tk_if"){
-        parea("tk_if", "tk_if")
-        parea("tk_parA", "tk_parA")
+function listadoDeclaracionParametrosLlamado(){
+    if(tokenActual.tipo == "tk_coma"){
+        parea("tk_coma", "tk_coma", "llamado")
+        parametrosLlamada()
+    }
+}
+
+function divLlamadoAsignacion(){
+    if (tokenActual.tipo == "tk_parA"){
+        parea("tk_parA", "tk_parA", "asignacion")
+        parametrosLlamada()
+        parea("tk_parC", "tk_parC", "asignacion")
+        parea("tk_puntoComa", "tk_puntoComa", "asignacion")
+    }else if(tokenActual.tipo == "tk_igual"){
+        parea("tk_igual", "tk_igual", "asginacion")
         expresion()
-        parea("tk_parC", "tk_parC")
-        parea("tk_llaveA", "tk_llaveA")
-        internoCiclo()
-        parea("tk_llaveC", "tk_llaveC")
-        ifElse()
+        parea("tk_puntoComa", "tk_puntoComa", "asignacion")
     }else{
-        parea("tk_error", "tk_llave | tk_if")
+        parea("tk_error", "tk_parA | tk_igual")
     }
 }
 
-function internoCiclo(){
-    if(tokenActual.tipo == "tk_break"){
-        parea("tk_break", "tk_break")
-    }else if(tokenActual.tipo == "tk_continue"){
-        parea("tk_continue", "tk_continue")
+function llamadoAsignacion(){
+    if(tokenActual.tipo == "tk_identificador"){
+        parea("tk_identificador", "tk_identificador", "asignacion")
+        divLlamadoAsignacion()    
     }else{
-        interno()
+        parea("tk_error", "tk_identificador")
     }
 }
 
+/*
 function declaracionFor(){
     if(tokenActual.tipo == "tk_int" || tokenActual.tipo == "tk_boolean" 
     || tokenActual.tipo == "tk_double" || tokenActual.tipo == "tk_string" 
@@ -950,7 +953,6 @@ function parea(preAnalisis, esperado, contexto){
     }else{
         console.log("error")
         listadoErroresSintacticos.push({encontrado: tokenActual.tipo, esperado: esperado})
-        //aqui va el error+
         //y la consumida de tokens hasta encontrar un ; 
     }
 }
@@ -1105,6 +1107,109 @@ function traduccion(tokenTraducir, contexto){
         }else if(tokenTraducir.tipo == "tk_puntoComa"){
             especial = ""
         }
+    }else if(contexto == "while"){
+        if(tokenTraducir.tipo == "tk_while"){
+            traducido += tabulados + "while "
+        }else if(tokenTraducir.tipo == "tk_llaveA"){
+            traducido += ":\n"
+            tabulados += "\t"
+        }else if(tokenTraducir.tipo == "tk_llaveC"){
+            tabulados = tabulados.substring(0, tabulados.length - 1)
+            traducido += "\n"
+        }
+    }else if(contexto == "ciclo"){
+        if(tokenTraducir.tipo == "tk_continue"){
+            traducido += tabulados + "continue"
+        }else if(tokenTraducir.tipo == "tk_break"){
+            traducido += tabulados + "break"
+        }else if(tokenTraducir.tipo == "tk_puntoComa"){
+            traducido += "\n"
+        }
+    }else if(contexto == "dowhile"){
+        if (tokenTraducir.tipo == "tk_do"){
+            traducido += tabulados + "while"
+        }else if(tokenTraducir.tipo == "tk_llaveA"){
+            traducido += ":\n"
+            tabulados += "\t"
+        }else if(tokenTraducir.tipo == "tk_llaveC"){
+            tabulados = tabulados.substring(0, tabulados.length - 1)
+            traducido += "\n"
+        }
+    }else if(contexto == "if"){
+        if(tokenTraducir.tipo == "tk_if"){
+            traducido += tabulados + "if "
+        }else if(tokenTraducir.tipo == "tk_llaveA"){
+            traducido += ":\n"
+            tabulados += "\t"
+            console.log(tabulados.length)
+        }else if(tokenTraducir.tipo == "tk_llaveC"){
+            tabulados = tabulados.substring(0, tabulados.length - 1)
+            console.log(tabulados.length)
+            traducido += "\n"
+        }
+    }else if(contexto == "elseif"){
+        if(tokenTraducir.tipo == "tk_llaveA"){
+            traducido += ":\n"
+            tabulados += "\t"
+            console.log(tabulados.length)
+        }else if(tokenTraducir.tipo == "tk_llaveC"){
+            console.log(tabulados.length)
+            tabulados = tabulados.substring(0, tabulados.length - 1)
+            traducido += "\n"
+
+        }else if(tokenTraducir.tipo == "tk_if"){
+            traducido += tabulados + "elif "
+        }
+    }else if(contexto == "else"){
+        if(tokenTraducir.tipo == "tk_else"){
+            traducido += tabulados + "else"
+        }else if(tokenTraducir.tipo == "tk_llaveA"){
+            traducido += ":\n"
+            tabulados += "\t"
+            console.log(tabulados.length)
+        }else if(tokenTraducir.tipo == "tk_llaveC"){
+            console.log(tabulados.length)
+            tabulados = tabulados.substring(0, tabulados.length - 1)
+            traducido += "\n"
+        }
+    }else if(contexto == "return"){
+        if (tokenTraducir.tipo == "tk_return"){
+            traducido += tabulados + "return "
+        }else if(tokenTraducir.tipo == "tk_puntoComa"){
+            traducido += "\n"
+        }
+    }else if(contexto == "asginacion"){
+        if(tokenTraducir.tipo == "tk_identificador"){
+            traducido += tabulados + tokenTraducir.valor
+        }else if(tokenTraducir.tipo == "tk_igual"){
+            traducido += " = "
+        }else if(tokenTraducir.tipo == "tk_parA"){
+            traducido += "("
+        }else if(tokenTraducir.tipo == "tk_parC"){
+            traducido += ")"
+        }else if(tokenTraducir.tipo == "tk_puntoComa"){
+            traducido += "\n"
+        }
+    }else if(contexto == "llamado"){
+        if(tokenTraducir.tipo == "tk_identificador"){
+            traducido += tokenTraducir.valor
+        }else if(tokenTraducir.tipo == "tk_numero"){
+            traducido += tokenTraducir.valor
+        }else if(tokenTraducir.tipo == "tk_decimal"){
+            traducido += tokenTraducir.valor
+        }else if(tokenTraducir.tipo == "tk_true"){
+            traducido += " True "
+        }else if(tokenTraducir.tipo == "tk_false"){
+            traducido += " False "
+        }else if(tokenTraducir.tipo == "tk_stringTexto"){
+            traducido += tokenTraducir.valor
+        }else if(tokenTraducir.tipo == "tk_charTexto"){
+            traducido += tokenTraducir.valor
+        }else if(tokenTraducir.tipo == "tk_coma"){
+            traducido += ", "
+        }
+    }else if(contexto == "for"){
+        //aqui va la traduccion del for
     }
 }
 
