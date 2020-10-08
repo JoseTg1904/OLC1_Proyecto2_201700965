@@ -128,8 +128,8 @@
              | println ( <expresion> ) ;
 
 <internoCiclo> ::= <interno>
-                 | break ;
-                 | continue ;
+                 | break ; <internoCiclo>
+                 | continue ; <internoCiclo>
 
 <ParametrosLlamado> ::= identificador <ListadoDeclaracionParametrosLlamado> 
                       | entero <ListadoDeclaracionParametrosLlamado> 
