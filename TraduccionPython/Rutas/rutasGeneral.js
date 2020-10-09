@@ -1223,10 +1223,7 @@ function parea(preAnalisis, esperado, contexto, padreDot){
             }
             iteradorSintactico++
             if (iteradorSintactico < listaTokens.length){
-                if(listaTokens[iteradorSintactico].tipo == "tk_puntoComa" || 
-                listaTokens[iteradorSintactico].tipo == "tk_llaveA"){
-                    break
-                }
+                tokenActual = listaTokens[iteradorSintactico]
             }else{
                 break
             }
