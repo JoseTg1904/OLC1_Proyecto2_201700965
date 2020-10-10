@@ -17,14 +17,18 @@ var iteradorDot = 0;
 var banderaSalto = false;
 
 router.post("/traducirPython", (req, res) => {
-    analizadorLexico(req.body.contenido);
-    res.json({
-        erroresLexicos: listadoErroresLexicos,
-        erroresSintacticos: listadoErroresSintacticos,
-        traduccion: traducido,
-        arbol: dot,
-        tokens: listaTokens
-    })
+    if (req.body.contenido == ""){
+        res.json({respuesta:"No hay nada para analizar"})
+    }else{
+        analizadorLexico(req.body.contenido);
+        res.json({
+            erroresLexicos: listadoErroresLexicos,
+            erroresSintacticos: listadoErroresSintacticos,
+            traduccion: traducido,
+            arbol: dot,
+            tokens: listaTokens
+        })
+    }
 })
 
 function analizadorLexico(contenidoArchivo){
@@ -97,7 +101,6 @@ function analizadorLexico(contenidoArchivo){
                     columna++
                 }else if (caracter == "^"){
                     estado = 0
-                    
                     listaTokens.push({tipo: "tk_xor", valor: "^", 
                     fila: fila, columna: columna})
                     columna++
@@ -306,7 +309,7 @@ function analizadorLexico(contenidoArchivo){
                 }
                 break;
             case 13:
-                if (caracter.match(/[0-9]/i) || caracter.match(/[a-z]/i)){
+                if (caracter.match(/[0-9]/i) || caracter.match(/[a-z]/i) || caracter == "_"){
                     estado = 13
                     columna++
                     lexemaAuxiliar += caracter
