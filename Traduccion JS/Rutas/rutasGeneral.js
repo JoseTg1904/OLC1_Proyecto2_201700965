@@ -2,7 +2,14 @@ const express = require('express');
 
 const router = express.Router();
 
-router.get("/traducirJS", (req, res) => {
+const parser = require('./gramatica');
+
+var retorno = []
+
+router.post("/traducirJS", (req, res) => {
+    retorno = []
+    retorno = parser.parse(req.body.contenido);
+    console.log(retorno)
     res.json({mensaje:'hola'})
 })
 

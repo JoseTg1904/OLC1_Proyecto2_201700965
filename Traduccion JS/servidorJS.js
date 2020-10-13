@@ -19,7 +19,7 @@ servidor.use((req, res, next) => {
 });
 
 //configuracion del puerto 
-servidor.set('port', process.env.PORT || 3000);
+servidor.set('port', process.env.PORT || 3001);
 
 //middlewares
 servidor.use(morgan('dev'));
