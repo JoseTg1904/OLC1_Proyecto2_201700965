@@ -10,7 +10,9 @@ router.post("/traducirJS", (req, res) => {
     retorno = []
     retorno = parser.parse(req.body.contenido);
     console.log(retorno)
-    res.json({mensaje:'hola'})
+    retorno.traducido = retorno.traducido.replace("\n\n", "\n");  
+    console.error(retorno.traducido)
+    res.json({mensaje: retorno})
 })
 
 module.exports = router;

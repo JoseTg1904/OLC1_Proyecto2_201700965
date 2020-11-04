@@ -11,6 +11,11 @@ var traducido = "";
 var tabulados = "";
 var especial = "";
 var dot = "";
+var range1 = "";
+var banderaRange1 = false;
+var range2 = "";
+var banderaRange2 = false;
+var identificadorFor = "";
 var tokenActual;
 var iteradorSintactico = 0;
 var iteradorDot = 0;
@@ -30,6 +35,30 @@ router.post("/traducirPython", (req, res) => {
         })
     }
 })
+
+router.get("/obtenerTokens", (req, res) => {
+    res.json({tokens: listaTokens})
+})
+
+router.get("/obtenerErroresLexicos", (req, res) => {
+    res.json({erroresLexicos: listadoErroresLexicos})
+})
+
+router.get("/obtenerErroresSintacticos", (req, res) =>{
+    res.json({erroresSintacticos: listadoErroresSintacticos})
+})
+
+router.get("/obtenerArbol", (req, res) =>{
+    res.json({arbol: dot})
+})
+
+router.get("/obtenerTraduccion", (req, res) =>{
+    res.json({traduccion: traducido})
+})
+
+/*
+hacer mas peticiones para devolver todas las ondas
+*/
 
 function analizadorLexico(contenidoArchivo){
     listaTokens = [];
@@ -276,7 +305,7 @@ function analizadorLexico(contenidoArchivo){
                 if (caracter == "\n"){
                     etado = 0
                     columna++
-                    listaTokens.push({tipo: "tk_comentarioIndividual", valor: lexemaAuxiliar})
+                    //listaTokens.push({tipo: "tk_comentarioIndividual", valor: lexemaAuxiliar})
                     lexemaAuxiliar = ""
                 }else{
                     estado = 10
@@ -300,7 +329,7 @@ function analizadorLexico(contenidoArchivo){
                     estado = 0
                     columna++
                     lexemaAuxiliar = lexemaAuxiliar.substring(0, lexemaAuxiliar.length - 2)
-                    listaTokens.push({tipo: "tk_comentarioMultiple", valor: lexemaAuxiliar})
+                    //listaTokens.push({tipo: "tk_comentarioMultiple", valor: lexemaAuxiliar})
                     lexemaAuxiliar = ""
                 }else{
                     estado = 12
@@ -799,7 +828,6 @@ function divTipoFuncion(contexto, padreDot){
     }
 }
 
-//esta pendiente el for
 function interno(padreDot){
     if(tokenActual.tipo == "tk_system"){
         let hijoActual = "Cuerpo" + iteradorDot
@@ -813,17 +841,50 @@ function interno(padreDot){
         divPrint(hijoActual)
         interno(padreDot)
     }else if(tokenActual.tipo == "tk_for"){
-        parea("tk_for", "tk_for", "for")
-        parea("tk_parA", "tk_parA", "for")
-        declaracionFor()
-        parea("tk_puntoComa", "tk_puntoComa", "for")
-        expresion()
-        parea("tk_puntoComa", "tk_puntoComa", "for")
-        expresion()
-        parea("tk_parC", "tk_parC", "for")
-        parea("tk_llaveA", "tk_llaveA", "for")
-        internoCiclo()
-        parea("tk_llaveC", "tk_llaveC", "for")
+        let hijoActual = "Cuerpo" + iteradorDot
+        iteradorDot++
+        dot += "\"" + hijoActual + "\" [label = \"For\"]\n"
+        dot += "\"" + padreDot + "\" -> \"" + hijoActual + "\"\n"
+        parea("tk_for", "tk_for", "for", hijoActual)
+        parea("tk_parA", "tk_parA", "for", hijoActual)
+        let hijoActual1 = "Cuerpo" + iteradorDot
+        dot += "\"" + hijoActual1 + "\" [label = \"Declaracion\"]\n"
+        dot += "\"" + hijoActual + "\" -> \"" + hijoActual1 + "\"\n"  
+        iteradorDot++
+        banderaRange1 = true;
+        declaracionFor(hijoActual1)
+        banderaRange1 = false;
+        parea("tk_puntoComa", "tk_puntoComa", "for", hijoActual)
+        
+        let hijoActual2 = "Cuerpo" + iteradorDot
+        dot += "\"" + hijoActual2 + "\" [label = \"Expresion\"]\n"
+        dot += "\"" + hijoActual + "\" -> \"" + hijoActual2 + "\"\n"  
+        iteradorDot++
+        
+        banderaRange2 = true;
+        expresion(hijoActual2)
+        banderaRange2 = false;
+        parea("tk_puntoComa", "tk_puntoComa", "for", hijoActual)
+        
+        let hijoActual3 = "Cuerpo" + iteradorDot
+        dot += "\"" + hijoActual3 + "\" [label = \"Declaracion\"]\n"
+        dot += "\"" + hijoActual + "\" -> \"" + hijoActual3 + "\"\n"  
+        iteradorDot++
+        
+        expresion(hijoActual3)
+
+        parea("tk_parC", "tk_parC", "for", hijoActual)
+        parea("tk_llaveA", "tk_llaveA", "for", hijoActual)
+
+        let hijoActual4 = "Cuerpo" + iteradorDot
+        dot += "\"" + hijoActual4 + "\" [label = \"Interno\"]\n"
+        dot += "\"" + hijoActual + "\" -> \"" + hijoActual4 + "\"\n"  
+        iteradorDot++
+
+
+        internoCiclo(hijoActual4)
+
+        parea("tk_llaveC", "tk_llaveC", "for", hijoActual)
         interno(padreDot)
     }else if(tokenActual.tipo == "tk_while"){
         let hijoActual = "Cuerpo" + iteradorDot
@@ -1083,28 +1144,26 @@ function llamadoAsignacion(padreDot){
     }
 }
 
-/*
-function declaracionFor(){
+function declaracionFor(padreDot){
     if(tokenActual.tipo == "tk_int" || tokenActual.tipo == "tk_boolean" 
     || tokenActual.tipo == "tk_double" || tokenActual.tipo == "tk_string" 
     || tokenActual.tipo == "tk_char"){
-        tipo()
-        identificadorDeclaracionFor()
+        tipo("forRange", padreDot)
+        identificadorDeclaracionFor(padreDot)
     }else{
-        parea("tk_eror", "tk_tipo")
+        parea("tk_error", "tk_tipo")
     }
 }
 
-function identificadorDeclaracionFor(){
+function identificadorDeclaracionFor(padreDot){
     if(tokenActual.tipo == "tk_identificador"){
-        parea("tk_identificador", "tk_identificador")
-        parea("tk_igual", "tk_igual")
-        expresion()
+        parea("tk_identificador", "tk_identificador", "forRange", padreDot)
+        parea("tk_igual", "tk_igual", "forRange", padreDot)
+        expresion(padreDot)
     }else{
         parea("tk_error", "tk_identificador")
     }
 }
-*/
 
 function expresion(padreDot){
     if(tokenActual.tipo == "tk_menos"){
@@ -1278,55 +1337,205 @@ function traduccion(tokenTraducir, contexto){
         }
     }else if(contexto == "expresion"){
         if(tokenTraducir.tipo == "tk_menos"){
-            traducido += " - "
+            if(banderaRange1){
+                range1 += " - "
+            }else if(banderaRange2){
+                range2 += " - "
+            }else{
+                traducido += " - "
+            }
         }else if(tokenTraducir.tipo == "tk_not"){
-            traducido += " not "
+            if(banderaRange1){
+                range1 += " not "
+            }else if(banderaRange2){
+                range2 += " not "
+            }else{
+                traducido += " not "
+            }
         }else if(tokenTraducir.tipo == "tk_stringTexto"){
-            traducido += tokenTraducir.valor
+            if(banderaRange1){
+                range1 += tokenTraducir.valor
+            }else if(banderaRange2){
+                range2 += tokenTraducir.valor
+            }else{
+                traducido += tokenTraducir.valor
+            }
         }else if(tokenTraducir.tipo == "tk_charTexto"){
-            traducido += tokenTraducir.valor
+            if(banderaRange1){
+                range1 += tokenTraducir.valor
+            }else if(banderaRange2){
+                range2 += tokenTraducir.valor
+            }else{
+                traducido += tokenTraducir.valor
+            }
         }else if(tokenTraducir.tipo == "tk_numero"){
-            traducido += tokenTraducir.valor
+            if(banderaRange1){
+                range1 += tokenTraducir.valor
+            }else if(banderaRange2){
+                range2 += tokenTraducir.valor
+            }else{
+                traducido += tokenTraducir.valor
+            }
         }else if(tokenTraducir.tipo == "tk_decimal"){
-            traducido += tokenTraducir.valor
+            if(banderaRange1){
+                range1 += tokenTraducir.valor
+            }else if(banderaRange2){
+                range2 += tokenTraducir.valor
+            }else{
+                traducido += tokenTraducir.valor
+            }
         }else if(tokenTraducir.tipo == "tk_identificador"){
-            traducido += tokenTraducir.valor
+            if(banderaRange1){
+                range1 += tokenTraducir.valor
+            }else if(banderaRange2){
+                range2 += tokenTraducir.valor
+            }else{
+                traducido += tokenTraducir.valor
+            }
         }else if(tokenTraducir.tipo == "tk_true"){
-            traducido += " True "
+            if(banderaRange1){
+                range1 += " True "
+            }else if(banderaRange2){
+                range2 += " True "
+            }else{
+                traducido += " True "
+            }
         }else if(tokenTraducir.tipo == "tk_false"){
-            traducido += " False "
+            if(banderaRange1){
+                range1 += " False "
+            }else if(banderaRange2){
+                range2 += " False "
+            }else{
+                traducido += " False "
+            }
         }else if(tokenTraducir.tipo == "tk_parA"){
-            traducido += "("
+            if(banderaRange1){
+                range1 += "("
+            }else if(banderaRange2){
+                range2 += "("
+            }else{
+                traducido += "("
+            }
         }else if(tokenTraducir.tipo == "tk_parC"){
-            traducido += ")"
+            if(banderaRange1){
+                range1 += ")"
+            }else if(banderaRange2){
+                range2 += ")"
+            }else{
+                traducido += ")"    
+            }
         }else if(tokenTraducir.tipo == "tk_and"){
-            traducido += " and "    
+            if(banderaRange1){
+                range1 += " and "
+            }else if(banderaRange2){
+                range2 += " and "
+            }else{
+                traducido += " and "
+            }
         }else if(tokenTraducir.tipo == "tk_or"){
-            traducido += " or " 
+            if(banderaRange1){
+                range1 += " or "
+            }else if(banderaRange2){
+                range2 += " or "
+            }else{
+                traducido += " or "
+            }
         }else if(tokenTraducir.tipo == "tk_xor"){
-            traducido += " xor "
+            if(banderaRange1){
+                range1 += " xor "
+            }else if(banderaRange2){
+                range2 += " xor "
+            }else{
+                traducido += " xor "
+            }
         }else if(tokenTraducir.tipo == "tk_adicion"){
-            traducido += " += "
+            if(banderaRange1){
+                range1 += " += "
+            }else if(banderaRange2){
+                range2 += " += "
+            }else{
+                traducido += " += "
+            }
         }else if(tokenTraducir.tipo == "tk_sustraccion"){
-            traducido += " -= "
+            if(banderaRange1){
+                range1 += " -= "
+            }else if(banderaRange2){
+                range2 += " -= "
+            }else{
+                traducido += " -= "
+            }
         }else if(tokenTraducir.tipo == "tk_mayor"){
-            traducido += " > "
+            if(banderaRange1){
+                range1 += " > "
+            }else if(banderaRange2){
+                range2 += " > "
+            }else{
+                traducido += " > "
+            }
         }else if(tokenTraducir.tipo == "tk_menor"){
-            traducido += " < "
+            if(banderaRange1){
+                range1 += " < "
+            }else if(banderaRange2){
+                range2 += " < "
+            }else{
+                traducido += " < "
+            }
         }else if(tokenTraducir.tipo == "tk_mayorIgual"){
-            traducido += " >= "
+            if(banderaRange1){
+                range1 += " >= "
+            }else if(banderaRange2){
+                range2 += " >= "
+            }else{
+                traducido += " >= "
+            }
         }else if(tokenTraducir.tipo == "tk_menorIgual"){
-            traducido += " <= "
+            if(banderaRange1){
+                range1 += " <= "
+            }else if(banderaRange2){
+                range2 += " <= "
+            }else{
+                traducido += " <= "
+            }
         }else if(tokenTraducir.tipo == "tk_igualacion"){
-            traducido += " == "
+            if(banderaRange1){
+                range1 += " == "
+            }else if(banderaRange2){
+                range2 += " == "
+            }else{
+                traducido += " == "
+            }
         }else if(tokenTraducir.tipo == "tk_distinto"){
-            traducido += " != "
+            if(banderaRange1){
+                range1 += " != "
+            }else if(banderaRange2){
+                range2 += " != "
+            }else{
+                traducido += " != "
+            }
         }else if(tokenTraducir.tipo == "tk_mas"){
-            traducido += " + "
+            if(banderaRange1){
+                range1 += " + "
+            }else if(banderaRange2){
+                range2 += " + "
+            }else{
+                traducido += " + "
+            }
         }else if(tokenTraducir.tipo == "tk_por"){
-            traducido += " * "
+            if(banderaRange1){
+                range1 += " * "
+            }else if(banderaRange2){
+                range2 += " * "
+            }else{
+                traducido += " * "
+            }
         }else if(tokenTraducir.tipo == "tk_division"){
-            traducido += " / "
+            if(banderaRange1){
+                range1 += " / "
+            }else if(banderaRange2){
+                range2 += " / "
+            }else{
+                traducido += " / "
+            }
         }        
     }else if(contexto == "implementacion"){
         if(tokenTraducir.tipo == "tk_public"){
@@ -1455,7 +1664,7 @@ function traduccion(tokenTraducir, contexto){
         }else if(tokenTraducir.tipo == "tk_puntoComa"){
             traducido += "\n"
         }
-    }else if(contexto == "asginacion"){
+    }else if(contexto == "asignacion"){
         if(tokenTraducir.tipo == "tk_identificador"){
             traducido += tabulados + tokenTraducir.valor
         }else if(tokenTraducir.tipo == "tk_igual"){
@@ -1486,7 +1695,26 @@ function traduccion(tokenTraducir, contexto){
             traducido += ", "
         }
     }else if(contexto == "for"){
-        //aqui va la traduccion del for
+        if(tokenTraducir.tipo == "tk_for"){
+            traducido += tabulados + "for"
+        }else if(tokenTraducir.tipo == "tk_llaveA"){
+            traducido += ":\n"
+            tabulados += "\t"
+            console.log(tabulados.length)
+        }else if(tokenTraducir.tipo == "tk_llaveC"){
+            tabulados = tabulados.substring(0, tabulados.length - 1)
+            console.log(tabulados.length)
+            traducido += "\n"
+        }else if(tokenTraducir.tipo == "tk_parC"){
+            traducido += identificadorFor + " in range (" + range1 + ", " + range2 + ")"
+            identificadorFor = ""
+            range2 = ""
+            range1 = ""
+        }
+    }else if(contexto == "forRange"){
+        if(tokenTraducir.tipo == "tk_identificador"){
+            identificadorFor = tokenTraducir.valor
+        }
     }
 }
 
