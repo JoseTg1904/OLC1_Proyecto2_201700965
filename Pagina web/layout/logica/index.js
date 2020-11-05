@@ -20,7 +20,7 @@ function abrirArchivo(archivos){
 }
 
 function traducirAPython(){
-    fetch("http://localhost:3010/traducirJS", {
+    fetch("http://localhost:3000/traducirJS", {
         method: 'POST',
         mode: 'cors',
         body: JSON.stringify({

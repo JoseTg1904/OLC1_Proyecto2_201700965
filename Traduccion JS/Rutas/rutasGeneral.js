@@ -4,15 +4,57 @@ const router = express.Router();
 
 const parser = require('./gramatica');
 
-var retorno = []
+var listaTokens = [];
+var listaErroresLexicos = [];
+var listaErroresSintacticos = [];
+var retorno = [];
+var traduccion = "";
 
 router.post("/traducirJS", (req, res) => {
-    retorno = []
+    
+    /*Limpieza de las variables que almacenan el resultado del analisis*/
+    listaTokens = [];
+    listaErroresLexicos = [];
+    listaErroresSintacticos = [];
+    retorno = [];
+    traduccion = "";
+    
+    /*Resultado del analisis*/
     retorno = parser.parse(req.body.contenido);
-    console.log(retorno)
-    retorno.traducido = retorno.traducido.replace("\n\n", "\n");  
+    
+    /*Guardado de valores de retorno en las variables locales*/
+    listaTokens = retorno.tokens;
+    listaErroresLexicos = retorno.erroresLexicos;
+    listaErroresSintacticos = retorno.erroresSintacticos;
+    retorno.traducido = retorno.traducido.replace("\n\n", "\n");
+    traduccion = retorno.traducido;
+
+    /*Impresion para ver la traduccion*/
     console.error(retorno.traducido)
-    res.json({mensaje: retorno})
+
+    /*Envio de los resultados del analisis*/
+    res.json({erroresLexicos: listaErroresLexicos,
+            erroresSintacticos: listaErroresSintacticos,
+            traducido: traduccion,
+            tokens: listaTokens
+    })
 })
+
+router.get("/obtenerTokens", (req, res) => {
+    res.json({tokens: listaTokens})
+})
+
+router.get("/obtenerErroresLexicos", (req, res) => {
+    res.json({erroresLexicos: listaErroresLexicos})
+})
+
+router.get("/obtenerErroresSintacticos", (req, res) =>{
+    res.json({erroresSintacticos: listaErroresSintacticos})
+})
+
+router.get("/obtenerTraduccion", (req, res) =>{
+    res.json({traducido: traduccion})
+})
+
 
 module.exports = router;

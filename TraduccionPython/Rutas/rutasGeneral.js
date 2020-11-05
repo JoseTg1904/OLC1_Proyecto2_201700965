@@ -56,10 +56,6 @@ router.get("/obtenerTraduccion", (req, res) =>{
     res.json({traduccion: traducido})
 })
 
-/*
-hacer mas peticiones para devolver todas las ondas
-*/
-
 function analizadorLexico(contenidoArchivo){
     listaTokens = [];
     listadoErroresLexicos = []

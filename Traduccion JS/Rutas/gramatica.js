@@ -85,22 +85,19 @@ var $0 = $$.length - 1;
 switch (yystate) {
 case 1:
  var retorno = {tokens: listaTokens, erroresLexicos: listaErroresLexicos,
-                                listado: listado, traducido: traduccion};
+                                erroresSintacticos: listaErroresSintacticos, traducido: traduccion};
                                 listaTokens = [];
                                 listaErroresLexicos = [];
-                                listado = [];
+                                listaErroresSintacticos = [];
                                 traduccion = "";
-                                tabulados = "";
                                 return retorno;
 break;
 case 5:
 traduccion += $$[$0-5];
                                                                                         traduccion += " " + $$[$0-4];
                                                                                         traduccion += $$[$0-3] + "\n";
-                                                                                        tabulados += "\t";
                                                                                         traduccion += $$[$0-2];
                                                                                         traduccion += "\n" + $$[$0-1] + "\n";
-                                                                                        tabulados = tabulados.substring(0, tabulados.length - 1);
 break;
 case 6:
 listaErroresSintacticos.push({encontrado: yytext, 
@@ -112,28 +109,28 @@ listaErroresSintacticos.push({encontrado: yytext,
         esperado: "error en la definicion de metodos o funciones",
         fila: this._$.first_line, columna: this._$.first_column})
 break;
-case 32: case 33:
-this.$ = $$[$0-1] + $$[$0]
+case 28:
+this.$ = "var " + $$[$0-1] + $$[$0]
 break;
-case 34: case 40:
+case 29: case 31: case 34: case 40:
 this.$ = ""
 break;
+case 30: case 39:
+this.$ = $$[$0-1] + " " + $$[$0]
+break;
+case 32: case 33: case 37:
+this.$ = $$[$0-1] + $$[$0]
+break;
 case 35:
- this.$ = tabulados + "var " + $$[$0-1] + $$[$0] + "\n";
+this.$ = "var " + $$[$0-1] + $$[$0] + "\n";
 break;
 case 36:
 listaErroresSintacticos.push({encontrado: yytext, 
         esperado: "error en la declaracion de variables",
         fila: this._$.first_line, columna: this._$.first_column})
 break;
-case 37:
- this.$ = $$[$0-1] + $$[$0]
-break;
 case 38:
  this.$ = " " + $$[$0-2] + " " + $$[$0-1] + $$[$0];
-break;
-case 39:
-this.$ = $$[$0-1] + " " + $$[$0]
 break;
 case 41: case 42: case 51: case 52: case 53: case 56: case 57: case 58: case 59: case 60: case 61: case 62: case 63: case 64: case 65:
 this.$ = $$[$0-2] + " " + $$[$0-1] + $$[$0];
@@ -144,66 +141,96 @@ break;
 case 50:
 this.$ = $$[$0-3] + $$[$0-2] + $$[$0-1] + $$[$0];
 break;
-case 66:
+case 66: case 76: case 85: case 87: case 106:
 this.$ = "";
 break;
+case 67:
+this.$ = $$[$0]
+break;
 case 68:
-traduccion += 
-                                                                                                "function " + $$[$0-6] + 
-                                                                                                " " + $$[$0-5] + " " + 
-                                                                                                $$[$0-3] + " " + $$[$0-2] + "\n";
-                                                                                                traduccion += $$[$0] + "\n";
+this.$ = "function " + $$[$0-6] + $$[$0-5] + $$[$0-4] + $$[$0-3] + $$[$0-2] + "\n";
+                                                                                                this.$ += $$[$0-1] + "\n" + $$[$0] + "\n";
 break;
 case 69:
-traduccion += 
-                                                                                                "function main()" + $$[$0-2] + "\n";
-                                                                                                traduccion += $$[$0] + "\n";
+this.$ = "function main()" + $$[$0-2] + "\n";
+                                                                                                                                this.$ += $$[$0-1] + "\n" + $$[$0] + "\n";
 break;
 case 70:
-listado.push({elemento: "sintactico", 
-        encontrado: yytext, esperado: "tk_funcion | tk_static",
-        fila: yylloc.first_line, columna: yylloc.first_column })
+listaErroresSintacticos.push({encontrado: yytext, 
+        esperado: "error en la implementacion de funciones",
+        fila: this._$.first_line, columna: this._$.first_column})
 break;
-case 78:
-traduccion += $$[$0-7] + " " + $$[$0-6] + " " + $$[$0-4] + " " + $$[$0-3] + "\n"; 
-                                                                                        traduccion += $$[$0-1] + "\n";
+case 71: case 72: case 73: case 86: case 98: case 99: case 100: case 101: case 102: case 103: case 104: case 105: case 107:
+this.$ = $$[$0-1] + $$[$0];
+break;
+case 74: case 75: case 84: case 94:
+this.$ = $$[$0];
+break;
+case 77:
+this.$ = $$[$0-11] + $$[$0-10] + $$[$0-9] + $$[$0-8] + " " + $$[$0-7] + $$[$0-6] + " " + $$[$0-5] + $$[$0-4] + $$[$0-3] + "\n" + $$[$0-2] + "\n" $$[$0-1] + "\n" + $$[$0];
+break;
+case 78: case 89:
+this.$ = $$[$0-7] + $$[$0-6] + $$[$0-5] + $$[$0-4] + $$[$0-3] + "\n" + $$[$0-2] + "\n" + $$[$0-1] + "\n" + $$[$0];
 break;
 case 79:
-traduccion += $$[$0-8] + " " + $$[$0-7] + " " + $$[$0-5] + " " + $$[$0-4] + "\n"
-                                                                                        traduccion += $$[$0-2] + "\n";
+this.$ = $$[$0-8] + $$[$0-7] + $$[$0-6] + $$[$0-5] + $$[$0-4] + "\n" + $$[$0-3] + "\n" + $$[$0-2] + $$[$0-1] + "\n" + $$[$0];
 break;
 case 80:
-listado.push({elemento: "sintactico", 
-        encontrado: yytext, esperado: "tk_for | tk_while",
-        fila: yylloc.first_line, columna: yylloc.first_column })
+listaErroresSintacticos.push({encontrado: yytext, 
+        esperado: "error en la definicion de for, while o if",
+        fila: this._$.first_line, columna: this._$.first_column})
 break;
 case 81:
-traduccion += $$[$0-3] + " " + $$[$0-1] + "\n";
+this.$ = $$[$0-3] + " " + $$[$0-2] + $$[$0-1] + "\n" + $$[$0];
+break;
+case 82:
+this.$ = $$[$0-9] + $$[$0-8] + "\n" + $$[$0-7] + "\n" + $$[$0-6] + $$[$0-5] + $$[$0-4] + $$[$0-3] + $$[$0-2] + $$[$0-1] + "\n" + $$[$0];
 break;
 case 83:
-listado.push({elemento: "sintactico", 
-        encontrado: yytext, esperado: "tk_return | tk_do",
-        fila: yylloc.first_line, columna: yylloc.first_column })
+listaErroresSintacticos.push({encontrado: yytext, 
+        esperado: "error en la definicion de return o do while",
+        fila: this._$.first_line, columna: this._$.first_column})
+break;
+case 88:
+this.$ = $$[$0-2] + "\n" + $$[$0-1] + "\n" + $$[$0] + "\n";
 break;
 case 90:
-listado.push({elemento: "sintactico", 
-        encontrado: yytext, esperado: "tk_if",
-        fila: yylloc.first_line, columna: yylloc.first_column })
+listaErroresSintacticos.push({encontrado: yytext, 
+        esperado: "error en la definicion de else o else if",
+        fila: this._$.first_line, columna: this._$.first_column})
+break;
+case 91: case 92:
+this.$ = "console.log" + $$[$0-3] + $$[$0-2] + $$[$0-1] + $$[$0] + "\n";
 break;
 case 93:
-listado.push({elemento: "sintactico", 
-        encontrado: yytext, esperado: "tk_println | tk_print",
-        fila: yylloc.first_line, columna: yylloc.first_column })
+listaErroresSintacticos.push({encontrado: yytext, 
+        esperado: "error en la definicion de impresion en consola",
+        fila: this._$.first_line, columna: this._$.first_column})
+break;
+case 95: case 96:
+this.$ = $$[$0-2] + $$[$0-1] + "\n" + $$[$0];
 break;
 case 97:
-listado.push({elemento: "sintactico", 
-        encontrado: yytext, esperado: "tk_break | tk_continue",
-        fila: yylloc.first_line, columna: yylloc.first_column })
+listaErroresSintacticos.push({encontrado: yytext, 
+        esperado: "error en break o continue",
+        fila: this._$.first_line, columna: this._$.first_column})
+break;
+case 108:
+this.$ = $$[$0-3] + $$[$0-2] + $$[$0-1] + $$[$0] + "\n";
+break;
+case 109:
+this.$ = $$[$0-2] + $$[$0-1] + $$[$0] + "\n";
 break;
 case 110:
-listado.push({elemento: "sintactico",
-        encontrado: yytext, esperado: "tk_divAsignacion",
-        fila: yylloc.first_line, columna: yylloc.first_column})
+listaErroresSintacticos.push({encontrado: yytext, 
+        esperado: "error en la la llamada de metodos, funciones o asignacion de variables",
+        fila: this._$.first_line, columna: this._$.first_column})
+break;
+case 111:
+this.$ = "var " + $$[$0];
+break;
+case 112:
+this.$ = $$[$0-2] + $$[$0-1] + $$[$0];
 break;
 }
 },
@@ -457,12 +484,10 @@ _handle_error:
     return true;
 }};
 
-var listado = [];
 var listaTokens = [];
 var listaErroresLexicos = [];
 var listaErroresSintacticos = [];
 var traduccion = "";
-var tabulados = "";
 /* generated by jison-lex 0.3.4 */
 var lexer = (function(){
 var lexer = ({
