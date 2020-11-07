@@ -22,10 +22,17 @@ var iteradorDot = 0;
 var banderaSalto = false;
 
 router.post("/traducirPython", (req, res) => {
-    if (req.body.contenido == ""){
-        res.json({respuesta:"No hay nada para analizar"})
+    if (req.body.Contenido == ""){
+        res.json({
+            erroresLexicos: [],
+            erroresSintacticos: [],
+            traduccion: "",
+            arbol: "",
+            tokens: []
+        })
     }else{
-        analizadorLexico(req.body.contenido);
+        console.log(req.body)
+        analizadorLexico(req.body.Contenido);
         res.json({
             erroresLexicos: listadoErroresLexicos,
             erroresSintacticos: listadoErroresSintacticos,

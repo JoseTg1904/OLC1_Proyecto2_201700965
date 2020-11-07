@@ -163,18 +163,18 @@ var traduccion = "";
 "||"    {listaTokens.push({tipo: "tk_or", valor: yytext, 
         fila: yylloc.first_line, columna: yylloc.first_column});
         return "tk_or";}
-"+"     {listaTokens.push({tipo: "tk_mas", valor: yytext, 
-        fila: yylloc.first_line, columna: yylloc.first_column});
-        return "tk_mas";}
 "++"    {listaTokens.push({tipo: "tk_adicion", valor: yytext, 
         fila: yylloc.first_line, columna: yylloc.first_column});
         return "tk_adicion";}
-"-"     {listaTokens.push({tipo: "tk_menos", valor: yytext, 
+"+"     {listaTokens.push({tipo: "tk_mas", valor: yytext, 
         fila: yylloc.first_line, columna: yylloc.first_column});
-        return "tk_menos";}
+        return "tk_mas";}
 "--"    {listaTokens.push({tipo: "tk_sustraccion", valor: yytext, 
         fila: yylloc.first_line, columna: yylloc.first_column});
         return "tk_sustraccion";}
+"-"     {listaTokens.push({tipo: "tk_menos", valor: yytext, 
+        fila: yylloc.first_line, columna: yylloc.first_column});
+        return "tk_menos";}
 "/"     {listaTokens.push({tipo: "tk_division", valor: yytext, 
         fila: yylloc.first_line, columna: yylloc.first_column});
         return "tk_division";}
@@ -340,10 +340,8 @@ Implementacion
         : tk_public divTipoFuncion {$$ = $2};
 
 divTipoFuncion 
-        : TipoFuncion tk_identificador tk_parA Parametros tk_parC tk_llaveA interno tk_llaveC {$$ = "function " + $2 + $3 + $4 + $5 + $6 + "\n";
-                                                                                                $$ += $7 + "\n" + $8 + "\n";}
-        | tk_static tk_void tk_main tk_parA tk_string tk_corcheteA tk_corcheteC tk_args tk_parC tk_llaveA interno tk_llaveC {$$ = "function main()" + $10 + "\n";
-                                                                                                                                $$ += $11 + "\n" + $12 + "\n";} 
+        : TipoFuncion tk_identificador tk_parA Parametros tk_parC tk_llaveA interno tk_llaveC {$$ = "function " + $2 + $3 + $4 + $5 + $6 + "\n" + $7 + "\n" + $8 + "\n";}
+        | tk_static tk_void tk_main tk_parA tk_string tk_corcheteA tk_corcheteC tk_args tk_parC tk_llaveA interno tk_llaveC {$$ = "function main()" + $10 + "\n" + $11 + "\n" + $12 + "\n";} 
         | error tk_llaveC {listaErroresSintacticos.push({encontrado: yytext, 
         esperado: "error en la implementacion de funciones",
         fila: this._$.first_line, columna: this._$.first_column})};
@@ -357,7 +355,7 @@ interno
         | {$$ = "";};
 
 internoLlave
-        : tk_for tk_parA DeclaracionFor tk_puntoComa expresion tk_puntoComa expresion tk_parC tk_llaveA internoCiclo tk_llaveC interno {$$ = $1 + $2 + $3 + $4 + " " + $5 + $6 + " " + $7 + $8 + $9 + "\n" + $10 + "\n" $11 + "\n" + $12;}
+        : tk_for tk_parA DeclaracionFor tk_puntoComa expresion tk_puntoComa expresion tk_parC tk_llaveA internoCiclo tk_llaveC interno {$$ = $1 + $2 + $3 + $4 + " " + $5 + $6 + " " + $7 + $8 + $9 + "\n" + $10 + "\n" + $11 + "\n" + $12;}
         | tk_while tk_parA expresion tk_parC tk_llaveA internoCiclo tk_llaveC interno {$$ = $1 + $2 + $3 + $4 + $5 + "\n" + $6 + "\n" + $7 + "\n" + $8;}
         | tk_if tk_parA expresion tk_parC tk_llaveA interno tk_llaveC ifElse interno {$$ = $1 + $2 + $3 + $4 + $5 + "\n" + $6 + "\n" + $7 + $8 + "\n" + $9;}
         | error tk_llaveC {listaErroresSintacticos.push({encontrado: yytext, 
@@ -428,4 +426,4 @@ DeclaracionFor
         : Tipo IdentificadorDeclaracionFor {$$ = "var " + $2;};
 
 IdentificadorDeclaracionFor
-        : tk_identificador tk_igual expresion {$$ = $1 + $2 + $3;};
+        : tk_identificador tk_igual expresion {$$ = $1 + " " + $2 + " " + $3;};

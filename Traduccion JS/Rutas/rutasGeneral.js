@@ -19,8 +19,9 @@ router.post("/traducirJS", (req, res) => {
     retorno = [];
     traduccion = "";
     
+    console.log(req.body)
     /*Resultado del analisis*/
-    retorno = parser.parse(req.body.contenido);
+    retorno = parser.parse(req.body.Contenido);
     
     /*Guardado de valores de retorno en las variables locales*/
     listaTokens = retorno.tokens;
@@ -30,7 +31,7 @@ router.post("/traducirJS", (req, res) => {
     traduccion = retorno.traducido;
 
     /*Impresion para ver la traduccion*/
-    console.error(retorno.traducido)
+    console.error(traduccion)
 
     /*Envio de los resultados del analisis*/
     res.json({erroresLexicos: listaErroresLexicos,
@@ -55,6 +56,5 @@ router.get("/obtenerErroresSintacticos", (req, res) =>{
 router.get("/obtenerTraduccion", (req, res) =>{
     res.json({traducido: traduccion})
 })
-
 
 module.exports = router;

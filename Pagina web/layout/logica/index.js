@@ -20,16 +20,32 @@ function abrirArchivo(archivos){
 }
 
 function traducirAPython(){
-    fetch("http://localhost:3000/traducirJS", {
+    var salida = document.getElementById("entrada").value
+    salida = salida.replace("\n", " ")
+    console.log(salida)
+
+    /*traduccion a python*/
+    fetch("/traducirPython", {
         method: 'POST',
         mode: 'cors',
-        body: JSON.stringify({
-            contenido: document.getElementById("entrada").value
-        }),
+        body: JSON.stringify({contenido: salida}),
         headers:{
         'Content-Type': 'application/json'
         }
     }).then(res => res.json())
     .catch(error => console.error('Error:', error))
     .then(response => console.log('Success:', response));
+
+
+            /*Traduccion a js*/
+    fetch("/traducirJS", {
+        method: 'POST',
+        mode: 'cors',
+        body: JSON.stringify({contenido: salida}),
+        headers:{
+        'Content-Type': 'application/json',
+        }
+    }).then(res => res.json())
+    .catch(error => console.error('Error:', error))
+    .then(response => console.log('Success:', response))
 }

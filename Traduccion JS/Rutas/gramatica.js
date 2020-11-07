@@ -148,12 +148,10 @@ case 67:
 this.$ = $$[$0]
 break;
 case 68:
-this.$ = "function " + $$[$0-6] + $$[$0-5] + $$[$0-4] + $$[$0-3] + $$[$0-2] + "\n";
-                                                                                                this.$ += $$[$0-1] + "\n" + $$[$0] + "\n";
+this.$ = "function " + $$[$0-6] + $$[$0-5] + $$[$0-4] + $$[$0-3] + $$[$0-2] + "\n" + $$[$0-1] + "\n" + $$[$0] + "\n";
 break;
 case 69:
-this.$ = "function main()" + $$[$0-2] + "\n";
-                                                                                                                                this.$ += $$[$0-1] + "\n" + $$[$0] + "\n";
+this.$ = "function main()" + $$[$0-2] + "\n" + $$[$0-1] + "\n" + $$[$0] + "\n";
 break;
 case 70:
 listaErroresSintacticos.push({encontrado: yytext, 
@@ -167,7 +165,7 @@ case 74: case 75: case 84: case 94:
 this.$ = $$[$0];
 break;
 case 77:
-this.$ = $$[$0-11] + $$[$0-10] + $$[$0-9] + $$[$0-8] + " " + $$[$0-7] + $$[$0-6] + " " + $$[$0-5] + $$[$0-4] + $$[$0-3] + "\n" + $$[$0-2] + "\n" $$[$0-1] + "\n" + $$[$0];
+this.$ = $$[$0-11] + $$[$0-10] + $$[$0-9] + $$[$0-8] + " " + $$[$0-7] + $$[$0-6] + " " + $$[$0-5] + $$[$0-4] + $$[$0-3] + "\n" + $$[$0-2] + "\n" + $$[$0-1] + "\n" + $$[$0];
 break;
 case 78: case 89:
 this.$ = $$[$0-7] + $$[$0-6] + $$[$0-5] + $$[$0-4] + $$[$0-3] + "\n" + $$[$0-2] + "\n" + $$[$0-1] + "\n" + $$[$0];
@@ -230,7 +228,7 @@ case 111:
 this.$ = "var " + $$[$0];
 break;
 case 112:
-this.$ = $$[$0-2] + $$[$0-1] + $$[$0];
+this.$ = $$[$0-2] + " " + $$[$0-1] + " " + $$[$0];
 break;
 }
 },
@@ -1012,21 +1010,21 @@ case 48:listaTokens.push({tipo: "tk_or", valor: yy_.yytext,
         fila: yy_.yylloc.first_line, columna: yy_.yylloc.first_column});
         return "tk_or";
 break;
-case 49:listaTokens.push({tipo: "tk_mas", valor: yy_.yytext, 
-        fila: yy_.yylloc.first_line, columna: yy_.yylloc.first_column});
-        return "tk_mas";
-break;
-case 50:listaTokens.push({tipo: "tk_adicion", valor: yy_.yytext, 
+case 49:listaTokens.push({tipo: "tk_adicion", valor: yy_.yytext, 
         fila: yy_.yylloc.first_line, columna: yy_.yylloc.first_column});
         return "tk_adicion";
 break;
-case 51:listaTokens.push({tipo: "tk_menos", valor: yy_.yytext, 
+case 50:listaTokens.push({tipo: "tk_mas", valor: yy_.yytext, 
         fila: yy_.yylloc.first_line, columna: yy_.yylloc.first_column});
-        return "tk_menos";
+        return "tk_mas";
 break;
-case 52:listaTokens.push({tipo: "tk_sustraccion", valor: yy_.yytext, 
+case 51:listaTokens.push({tipo: "tk_sustraccion", valor: yy_.yytext, 
         fila: yy_.yylloc.first_line, columna: yy_.yylloc.first_column});
         return "tk_sustraccion";
+break;
+case 52:listaTokens.push({tipo: "tk_menos", valor: yy_.yytext, 
+        fila: yy_.yylloc.first_line, columna: yy_.yylloc.first_column});
+        return "tk_menos";
 break;
 case 53:listaTokens.push({tipo: "tk_division", valor: yy_.yytext, 
         fila: yy_.yylloc.first_line, columna: yy_.yylloc.first_column});
@@ -1060,7 +1058,7 @@ case 61:listaErroresLexicos.push({valor: yy_.yytext, fila: yy_.yylloc.first_line
 break;
 }
 },
-rules: [/^(?:[0-9]+\b)/i,/^(?:[0-9]+(\.[0-9]+)\b)/i,/^(?:public\b)/i,/^(?:true\b)/i,/^(?:false\b)/i,/^(?:class\b)/i,/^(?:interface\b)/i,/^(?:void\b)/i,/^(?:for\b)/i,/^(?:while\b)/i,/^(?:do\b)/i,/^(?:if\b)/i,/^(?:else\b)/i,/^(?:break\b)/i,/^(?:continue\b)/i,/^(?:return\b)/i,/^(?:int\b)/i,/^(?:boolean\b)/i,/^(?:double\b)/i,/^(?:string\b)/i,/^(?:char\b)/i,/^(?:static\b)/i,/^(?:main\b)/i,/^(?:args\b)/i,/^(?:system\b)/i,/^(?:out\b)/i,/^(?:print\b)/i,/^(?:println\b)/i,/^(?:\{)/i,/^(?:\})/i,/^(?:\()/i,/^(?:\))/i,/^(?:,)/i,/^(?:;)/i,/^(?:\^)/i,/^(?:\*)/i,/^(?:\.)/i,/^(?:\[)/i,/^(?:\])/i,/^(?:>)/i,/^(?:>=)/i,/^(?:<)/i,/^(?:<=)/i,/^(?:=)/i,/^(?:==)/i,/^(?:!)/i,/^(?:!=)/i,/^(?:&&)/i,/^(?:\|\|)/i,/^(?:\+)/i,/^(?:\+\+)/i,/^(?:-)/i,/^(?:--)/i,/^(?:\/)/i,/^(?:"[^\"]*")/i,/^(?:'[^\']*')/i,/^(?:\/\/.*)/i,/^(?:[/][*][^*]*[*]+([^/*][^*]*[*]+)*[/])/i,/^(?:[a-zA-Z]([a-zA-Z0-9_])*)/i,/^(?:$)/i,/^(?:[ \t\r\n\f])/i,/^(?:.)/i],
+rules: [/^(?:[0-9]+\b)/i,/^(?:[0-9]+(\.[0-9]+)\b)/i,/^(?:public\b)/i,/^(?:true\b)/i,/^(?:false\b)/i,/^(?:class\b)/i,/^(?:interface\b)/i,/^(?:void\b)/i,/^(?:for\b)/i,/^(?:while\b)/i,/^(?:do\b)/i,/^(?:if\b)/i,/^(?:else\b)/i,/^(?:break\b)/i,/^(?:continue\b)/i,/^(?:return\b)/i,/^(?:int\b)/i,/^(?:boolean\b)/i,/^(?:double\b)/i,/^(?:string\b)/i,/^(?:char\b)/i,/^(?:static\b)/i,/^(?:main\b)/i,/^(?:args\b)/i,/^(?:system\b)/i,/^(?:out\b)/i,/^(?:print\b)/i,/^(?:println\b)/i,/^(?:\{)/i,/^(?:\})/i,/^(?:\()/i,/^(?:\))/i,/^(?:,)/i,/^(?:;)/i,/^(?:\^)/i,/^(?:\*)/i,/^(?:\.)/i,/^(?:\[)/i,/^(?:\])/i,/^(?:>)/i,/^(?:>=)/i,/^(?:<)/i,/^(?:<=)/i,/^(?:=)/i,/^(?:==)/i,/^(?:!)/i,/^(?:!=)/i,/^(?:&&)/i,/^(?:\|\|)/i,/^(?:\+\+)/i,/^(?:\+)/i,/^(?:--)/i,/^(?:-)/i,/^(?:\/)/i,/^(?:"[^\"]*")/i,/^(?:'[^\']*')/i,/^(?:\/\/.*)/i,/^(?:[/][*][^*]*[*]+([^/*][^*]*[*]+)*[/])/i,/^(?:[a-zA-Z]([a-zA-Z0-9_])*)/i,/^(?:$)/i,/^(?:[ \t\r\n\f])/i,/^(?:.)/i],
 conditions: {"INITIAL":{"rules":[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61],"inclusive":true}}
 });
 return lexer;

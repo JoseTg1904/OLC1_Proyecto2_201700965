@@ -1,0 +1,49 @@
+digraph Arbol{
+"raiz" [label = "Raiz"]
+"clase0"[label = "Clase"]
+"raiz" -> "clase0"
+"tk_public11" [label = "public"]
+clase0 -> "tk_public11"
+"tk_class18" [label = "class"]
+clase0 -> "tk_class18"
+"tk_identificador114" [label = "hola"]
+clase0 -> "tk_identificador114"
+"tk_llaveA118" [label = "{"]
+clase0 -> "tk_llaveA118"
+"CuerpoClase1" [label = "Cuerpo"]
+"clase0" -> "CuerpoClase1"
+"tk_llaveC119" [label = "}"]
+clase0 -> "tk_llaveC119"
+"clase2"[label = "Clase"]
+"raiz" -> "clase2"
+"tk_public121" [label = "public"]
+clase2 -> "tk_public121"
+"tk_class128" [label = "class"]
+clase2 -> "tk_class128"
+"tk_identificador134" [label = "adios"]
+clase2 -> "tk_identificador134"
+"tk_llaveA139" [label = "{"]
+clase2 -> "tk_llaveA139"
+"CuerpoClase3" [label = "Cuerpo"]
+"clase2" -> "CuerpoClase3"
+"tk_llaveC140" [label = "}"]
+clase2 -> "tk_llaveC140"
+"clase4"[label = "Clase"]
+"raiz" -> "clase4"
+"tk_public21" [label = "public"]
+clase4 -> "tk_public21"
+"tk_class28" [label = "class"]
+clase4 -> "tk_class28"
+"tk_identificador214" [label = "nel"]
+clase4 -> "tk_identificador214"
+"tk_llaveA217" [label = "{"]
+clase4 -> "tk_llaveA217"
+"CuerpoClase5" [label = "Cuerpo"]
+"clase4" -> "CuerpoClase5"
+"tk_llaveC218" [label = "}"]
+clase4 -> "tk_llaveC218"
+"clase6"[label = "Clase"]
+"raiz" -> "clase6"
+"tk_public31" [label = "public"]
+clase6 -> "tk_public31"
+}
