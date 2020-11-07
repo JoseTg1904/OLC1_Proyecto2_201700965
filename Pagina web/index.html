@@ -22,13 +22,23 @@
                 </li>
                 <li><a>Descargar</a>
                     <ul>
-                        <li><a>Ambos</a></li>
-                        <li><a>JavaScript</a></li>
-                        <li><a>Python</a></li>
+                        <li><a onclick="descargarAmbasTraducciones()">Ambos</a></li>
+                        <li><a onclick="descargarTraduccionJS()">JavaScript</a></li>
+                        <li><a onclick="descargarTraduccionPython()">Python</a></li>
                     </ul>
                 </li>
                 <li><a onclick="traducirAPython()">Traducir</a></li>
-                <li><a>Reportes</a></li>
+                <li><a>Reportes</a>
+                    <ul>
+                        <li><a onclick="abrirReportes(1)">Errores lexicos Python</a></li>
+                        <li><a onclick="abrirReportes(2)">Errores sintacticos Python</a></li>
+                        <li><a onclick="abrirReportes(3)">Tokens Python</a></li>
+                        <li><a onclick="abrirReportes(4)">Errores lexicos JavaScript</a></li>
+                        <li><a onclick="abrirReportes(5)">Errores sintacticos JavaScript</a></li>
+                        <li><a onclick="abrirReportes(6)">Tokens JavaScript</a></li>
+                        <li><a onclick="abrirReportes(7)">Arbol de analisis sintactico</a></li>
+                    </ul>
+                </li>
                 <li><a>Carnet: 201700965</a></li>
             </ul>
         </nav>

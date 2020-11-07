@@ -12,11 +12,12 @@ import (
 	"strconv"
 )
 
-//structs para almacenar los json de respuesta de los analizadores
+//structs para almacenar el json de salida hacia los analizadores
 type entrada struct {
 	Contenido string
 }
 
+//structs para almacenar los json de respuesta de los analizadores
 type retornoPython struct {
 	ErroresLexicos     []errorLexico
 	ErroresSintacticos []errorSintactico
@@ -142,15 +143,16 @@ func mostrarArbol(dot string) {
 	archivoSalida, _ := os.Create("./Reportes/Arbol.dot")
 	archivoSalida.WriteString(dot)
 	archivoSalida.Close()
-	exec.Command("dot", "./Reportes/Arbol.dot", "-Tpng", "-o", "./Reportes/Arbol.png").Output()
+	exec.Command("dot", "./Reportes/Arbol.dot", "-Tpng", "-o", "./Reportes/Arbol.png").Run()
 	htmlSalida, _ := os.Create("Arbol.html")
-	salida := "<html>\n<body>\n<img src = \"Reportes/Arbol.png\">\n</body>\n</html>"
+	salida := "<html>\n<title>Arbol de analisis sintactico</title>\n<img src = \"Reportes/Arbol.png\">\n</html>"
 	htmlSalida.WriteString(salida)
 	htmlSalida.Close()
 }
 
 func erroresLexicosPython(errores []errorLexico) {
 	contenidoErrores := `<html>
+	<title>Errores lexicos Python</title>
     <table class="egt" border>
     <tr>
         <th> No. </th>
@@ -181,6 +183,7 @@ func erroresLexicosPython(errores []errorLexico) {
 
 func erroresLexicosJS(errores []errorLexico) {
 	contenidoErrores := `<html>
+	<title>Errores lexicos JavaScript</title>
     <table class="egt" border>
     <tr>
         <th> No. </th>
@@ -211,6 +214,7 @@ func erroresLexicosJS(errores []errorLexico) {
 
 func erroresSintacticosPython(errores []errorSintactico) {
 	contenidoErrores := `<html>
+	<title>Errores sintacticos Python</title>
     <table class="egt" border>
     <tr>
         <th> No. </th>
@@ -242,6 +246,7 @@ func erroresSintacticosPython(errores []errorSintactico) {
 
 func erroresSintacticoJS(errores []errorSintactico) {
 	contenidoErrores := `<html>
+	<title>Errores sintacticos JavaScript</title>
     <table class="egt" border>
     <tr>
         <th> No. </th>
@@ -274,6 +279,7 @@ func erroresSintacticoJS(errores []errorSintactico) {
 
 func tokensPython(tokens []token) {
 	contenidoErrores := `<html>
+	<title>Tokens Python</title>
     <table class="egt" border>
     <tr>
         <th> No. </th>
@@ -306,6 +312,7 @@ func tokensPython(tokens []token) {
 
 func tokensJS(tokens []token) {
 	contenidoErrores := `<html>
+	<title>Tokens JavaScript</title>
     <table class="egt" border>
     <tr>
         <th> No. </th>
