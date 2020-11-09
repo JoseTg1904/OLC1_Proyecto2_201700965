@@ -92,12 +92,12 @@ var traduccion = "";
 "out"           {listaTokens.push({tipo: "tk_out", valor: yytext, 
                 fila: yylloc.first_line, columna: yylloc.first_column});
                 return "tk_out";}
-"print"         {listaTokens.push({tipo: "tk_print", valor: yytext, 
-                fila: yylloc.first_line, columna: yylloc.first_column});
-                return "tk_print";}
 "println"       {listaTokens.push({tipo: "tk_println", valor: yytext, 
                 fila: yylloc.first_line, columna: yylloc.first_column});
                 return "tk_println";}
+"print"         {listaTokens.push({tipo: "tk_print", valor: yytext, 
+                fila: yylloc.first_line, columna: yylloc.first_column});
+                return "tk_print";}
 
 /*conjunto de simbolos aceptados*/
 "{"     {listaTokens.push({tipo: "tk_llaveA", valor: yytext, 
@@ -133,30 +133,30 @@ var traduccion = "";
 "]"     {listaTokens.push({tipo: "tk_corcheteC", valor: yytext, 
         fila: yylloc.first_line, columna: yylloc.first_column});
         return "tk_corcheteC";}
-">"     {listaTokens.push({tipo: "tk_mayor", valor: yytext, 
-        fila: yylloc.first_line, columna: yylloc.first_column});
-        return "tk_mayor";}
 ">="    {listaTokens.push({tipo: "tk_mayorIgual", valor: yytext, 
         fila: yylloc.first_line, columna: yylloc.first_column});
         return "tk_mayorIgual";}
-"<"     {listaTokens.push({tipo: "tk_menor", valor: yytext, 
+">"     {listaTokens.push({tipo: "tk_mayor", valor: yytext, 
         fila: yylloc.first_line, columna: yylloc.first_column});
-        return "tk_menor";}
+        return "tk_mayor";}
 "<="    {listaTokens.push({tipo: "tk_menorIgual", valor: yytext, 
         fila: yylloc.first_line, columna: yylloc.first_column});
         return "tk_menorIgual";}
-"="     {listaTokens.push({tipo: "tk_igual", valor: yytext, 
+"<"     {listaTokens.push({tipo: "tk_menor", valor: yytext, 
         fila: yylloc.first_line, columna: yylloc.first_column});
-        return "tk_igual";}
+        return "tk_menor";}
 "=="    {listaTokens.push({tipo: "tk_igualacion", valor: yytext, 
         fila: yylloc.first_line, columna: yylloc.first_column});
         return "tk_igualacion";}
-"!"     {listaTokens.push({tipo: "tk_not", valor: yytext, 
+"="     {listaTokens.push({tipo: "tk_igual", valor: yytext, 
         fila: yylloc.first_line, columna: yylloc.first_column});
-        return "tk_not";}
+        return "tk_igual";}
 "!="    {listaTokens.push({tipo: "tk_distinto", valor: yytext, 
         fila: yylloc.first_line, columna: yylloc.first_column});
         return "tk_distinto";}
+"!"     {listaTokens.push({tipo: "tk_not", valor: yytext, 
+        fila: yylloc.first_line, columna: yylloc.first_column});
+        return "tk_not";}
 "&&"    {listaTokens.push({tipo: "tk_and", valor: yytext, 
         fila: yylloc.first_line, columna: yylloc.first_column});
         return "tk_and";}
