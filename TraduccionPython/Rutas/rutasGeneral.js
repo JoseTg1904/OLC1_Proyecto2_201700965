@@ -15,6 +15,7 @@ var range1 = "";
 var banderaRange1 = false;
 var range2 = "";
 var banderaRange2 = false;
+var banderaError = false;
 var identificadorFor = "";
 var tokenActual;
 var iteradorSintactico = 0;
@@ -176,11 +177,9 @@ function analizadorLexico(contenidoArchivo){
                 }else if (caracter == "\"" || caracter == "\“"){
                     estado = 17
                     columna++
-                    lexemaAuxiliar += caracter
                 }else if (caracter == "\'" || caracter == "\‘"){
                     estado = 18
                     columna++
-                    lexemaAuxiliar += caracter  
                 }else {
                     listadoErroresLexicos.push({valor:caracter, fila:fila, columna:columna})
                     columna++
@@ -306,7 +305,7 @@ function analizadorLexico(contenidoArchivo){
                 break;
             case 10:
                 if (caracter == "\n"){
-                    etado = 0
+                    estado = 0
                     columna++
                     //listaTokens.push({tipo: "tk_comentarioIndividual", valor: lexemaAuxiliar})
                     lexemaAuxiliar = ""
@@ -555,7 +554,6 @@ function analizadorLexico(contenidoArchivo){
             case 17:
                 if (caracter == "\"" || caracter == "\“"){
                     estado = 0
-                    lexemaAuxiliar += caracter
                     columna++
                     listaTokens.push({tipo: "tk_stringTexto", valor: lexemaAuxiliar, 
                     fila: fila, columna: columna - lexemaAuxiliar.length})
@@ -569,7 +567,6 @@ function analizadorLexico(contenidoArchivo){
             case 18:
                 if (caracter == "\'" || caracter == "\‘"){
                     estado = 0
-                    lexemaAuxiliar += caracter
                     columna++
                     listaTokens.push({tipo: "tk_charTexto", valor: lexemaAuxiliar, 
                     fila: fila, columna: columna - lexemaAuxiliar.length})
@@ -589,17 +586,7 @@ function analizadorLexico(contenidoArchivo){
     traducido = traducido.replace("  ", " ")
     traducido = traducido.replace("\n\n", "\n")
 
-    dot = dot.replace("\"\"", "\"")
-    dot = dot.replace("\"\"", "\"")
-
-    dot = dot.replace("\"\“", "\"")
-    dot = dot.replace("\“\"", "\"")
-
-    dot = dot.replace("\'\"", "\"")
-    dot = dot.replace("\"\'", "\"")
-
-    dot = dot.replace("\"\‘", "\"")
-    dot = dot.replace("\‘\"", "\"")
+    console.log(traducido)
 }
 
 function analizadorSintactico(){
@@ -607,11 +594,16 @@ function analizadorSintactico(){
     iteradorSintactico = 0;
     iteradorDot = 0;
     tokenActual = listaTokens[iteradorSintactico];
-    dot = "digraph Arbol{\n"
-    dot += "\"raiz\"" + " [label = \"Raiz\"]\n"
-    traducido = ""
-    tabulados = ""
-    publicoInterClass()
+    dot = "digraph Arbol{ "
+    dot += "\"raiz\"" + " [label = \"Raiz\"]; "
+    traducido = "";
+    tabulados = "";
+    identificadorFor = "";
+    banderaRange1 = false;
+    banderaRange2 = false;
+    if(listaTokens.length > 0){
+        publicoInterClass()
+    }
     dot += "}"
 }
 
@@ -621,11 +613,11 @@ function publicoInterClass(){
         if (iteradorSintactico + 1 < listaTokens.length){
             if(listaTokens[iteradorSintactico + 1].tipo == "tk_interface"){
                 hijoActual = "interface" + iteradorDot
-                dot += "\"" + hijoActual + "\"[label = \"Interfaz\"]\n"
-                dot += "\"raiz\" -> \"" + hijoActual + "\"\n"
+                dot += "\"" + hijoActual + "\"[label = \"Interfaz\"]; "
+                dot += "\"raiz\" -> \"" + hijoActual + "\"; "
             }else{
-                dot += "\"" + hijoActual + "\"[label = \"Clase\"]\n"
-                dot += "\"raiz\" -> \"" + hijoActual + "\"\n"
+                dot += "\"" + hijoActual + "\"[label = \"Clase\"]; "
+                dot += "\"raiz\" -> \"" + hijoActual + "\"; "
             }
         }
         iteradorDot++
@@ -640,8 +632,8 @@ function interClass(padreDot){
         parea("tk_identificador", "tk_identificador", "", padreDot)
         parea("tk_llaveA", "tk_llaveA", "", padreDot)
         let hijoActual = "CuerpoInterfaz" + iteradorDot
-        dot += "\"" + hijoActual + "\" [label = \"Cuerpo\"]\n"
-        dot += "\"" + padreDot + "\" -> \"" + hijoActual + "\"\n"
+        dot += "\"" + hijoActual + "\" [label = \"Cuerpo\"]; "
+        dot += "\"" + padreDot + "\" -> \"" + hijoActual + "\"; "
         iteradorDot++
         definicion(hijoActual)
         parea("tk_llaveC", "tk_llaveC", "", padreDot)
@@ -651,8 +643,8 @@ function interClass(padreDot){
         parea("tk_identificador", "tk_identificador", "", padreDot)
         parea("tk_llaveA", "tk_llaveA", "", padreDot)
         let hijoActual = "CuerpoClase" + iteradorDot
-        dot += "\"" + hijoActual + "\" [label = \"Cuerpo\"]\n"
-        dot += "\"" + padreDot + "\" -> \"" + hijoActual + "\"\n"  
+        dot += "\"" + hijoActual + "\" [label = \"Cuerpo\"]; "
+        dot += "\"" + padreDot + "\" -> \"" + hijoActual + "\"; "  
         iteradorDot++
         instrucciones(hijoActual)
         parea("tk_llaveC", "tk_llaveC", "", padreDot)
@@ -665,16 +657,16 @@ function interClass(padreDot){
 function definicion(padreDot){
     if (tokenActual.tipo == "tk_public"){
         let hijoActual = "definicionFuncion" + iteradorDot
-        dot += "\"" + padreDot + "\"" + " -> \"" + hijoActual + "\"\n"
-        dot += "\"" + hijoActual + "\" [label = \"Definicion\"]\n"
+        dot += "\"" + padreDot + "\"" + " -> \"" + hijoActual + "\"; "
+        dot += "\"" + hijoActual + "\" [label = \"Definicion\"]; "
         iteradorDot++
         parea("tk_public", "tk_public", "definicion", hijoActual)
         tipoFuncion("definicion", hijoActual)
         parea("tk_identificador", "tk_identificador", "definicion", hijoActual)
         parea("tk_parA", "tk_parA", "definicion", hijoActual)
         let parametrosActual = "parametros" + iteradorDot
-        dot += "\"" + hijoActual + "\"" + " -> \"" + parametrosActual + "\"\n"
-        dot += "\"" + parametrosActual + "\" [label = \"Parametros\"]\n"
+        dot += "\"" + hijoActual + "\"" + " -> \"" + parametrosActual + "\"; "
+        dot += "\"" + parametrosActual + "\" [label = \"Parametros\"]; "
         iteradorDot++
         parametros("definicion", parametrosActual)
         parea("tk_parC", "tk_parC", "definicion", hijoActual)
@@ -738,8 +730,8 @@ function instrucciones(padreDot){
 
 function declaracion(contexto, padreDot){
     let hijoActual = "Cuerpo" + iteradorDot
-    dot += "\"" + hijoActual + "\" [label = \"Declaracion\"]\n"
-    dot += "\"" + padreDot + "\" -> \"" + hijoActual + "\"\n"  
+    dot += "\"" + hijoActual + "\" [label = \"Declaracion\"]; "
+    dot += "\"" + padreDot + "\" -> \"" + hijoActual + "\"; "  
     iteradorDot++
     tipo(contexto, hijoActual)
     identificadorDeclaracion(contexto, hijoActual)
@@ -759,8 +751,8 @@ function listadoDeclaracion(contexto, padreDot){
     if(tokenActual.tipo == "tk_igual"){
         parea("tk_igual", "tk_igual", contexto, padreDot)
         let hijoActual = "Cuerpo" + iteradorDot
-        dot += "\"" + hijoActual + "\" [label = \"Expresion\"]\n"
-        dot += "\"" + padreDot + "\" -> \"" + hijoActual + "\"\n"  
+        dot += "\"" + hijoActual + "\" [label = \"Expresion\"]; "
+        dot += "\"" + padreDot + "\" -> \"" + hijoActual + "\"; "  
         iteradorDot++ 
         expresion(hijoActual)
         listadoDeclaracion(contexto, padreDot)
@@ -779,8 +771,8 @@ function implementacion(padreDot){
             }
         }
         let hijoActual = "Cuerpo" + iteradorDot
-        dot += "\"" + hijoActual + "\" [label = \"Implementacion\"]\n"
-        dot += "\"" + padreDot + "\" -> \"" + hijoActual + "\"\n"  
+        dot += "\"" + hijoActual + "\" [label = \"Implementacion\"]; "
+        dot += "\"" + padreDot + "\" -> \"" + hijoActual + "\"; "  
         iteradorDot++
         parea("tk_public", "tk_public", contextoActual, hijoActual)
         divTipoFuncion("implementacion", hijoActual)
@@ -802,8 +794,8 @@ function divTipoFuncion(contexto, padreDot){
         parea("tk_parC", "tk_parC", "main", padreDot)
         parea("tk_llaveA", "tk_llaveA", "main", padreDot)
         let hijoActual = "Cuerpo" + iteradorDot
-        dot += "\"" + hijoActual + "\" [label = \"Cuerpo\"]\n"
-        dot += "\"" + padreDot + "\" -> \"" + hijoActual + "\"\n"  
+        dot += "\"" + hijoActual + "\" [label = \"Cuerpo\"]; "
+        dot += "\"" + padreDot + "\" -> \"" + hijoActual + "\"; "  
         iteradorDot++
         interno(hijoActual)
         parea("tk_llaveC", "tk_llaveC", "main", padreDot)
@@ -814,15 +806,15 @@ function divTipoFuncion(contexto, padreDot){
         parea("tk_identificador", "tk_identificador", contexto, padreDot)
         parea("tk_parA", "tk_parA", contexto, padreDot)
         let hijoActual1 = "Cuerpo" + iteradorDot
-        dot += "\"" + hijoActual1 + "\" [label = \"Parametros\"]\n"
-        dot += "\"" + padreDot + "\" -> \"" + hijoActual1 + "\"\n"  
+        dot += "\"" + hijoActual1 + "\" [label = \"Parametros\"]; "
+        dot += "\"" + padreDot + "\" -> \"" + hijoActual1 + "\"; "  
         iteradorDot++
         parametros(contexto, hijoActual1)
         parea("tk_parC", "tk_parC", contexto, padreDot)
         parea("tk_llaveA", "tk_llaveA", contexto, padreDot)
         let hijoActual = "Cuerpo" + iteradorDot
-        dot += "\"" + hijoActual + "\" [label = \"Cuerpo\"]\n"
-        dot += "\"" + padreDot + "\" -> \"" + hijoActual + "\"\n"  
+        dot += "\"" + hijoActual + "\" [label = \"Cuerpo\"]; "
+        dot += "\"" + padreDot + "\" -> \"" + hijoActual + "\"; "  
         iteradorDot++
         interno(hijoActual)
         parea("tk_llaveC", "tk_llaveC", contexto, padreDot)
@@ -834,8 +826,8 @@ function divTipoFuncion(contexto, padreDot){
 function interno(padreDot){
     if(tokenActual.tipo == "tk_system"){
         let hijoActual = "Cuerpo" + iteradorDot
-        dot += "\"" + hijoActual + "\" [label = \"Print\"]\n"
-        dot += "\"" + padreDot + "\" -> \"" + hijoActual + "\"\n"  
+        dot += "\"" + hijoActual + "\" [label = \"Print\"]; "
+        dot += "\"" + padreDot + "\" -> \"" + hijoActual + "\"; "  
         iteradorDot++
         parea("tk_system", "tk_system", "print", hijoActual)
         parea("tk_punto", "tk_punto", "print", hijoActual)
@@ -846,13 +838,13 @@ function interno(padreDot){
     }else if(tokenActual.tipo == "tk_for"){
         let hijoActual = "Cuerpo" + iteradorDot
         iteradorDot++
-        dot += "\"" + hijoActual + "\" [label = \"For\"]\n"
-        dot += "\"" + padreDot + "\" -> \"" + hijoActual + "\"\n"
+        dot += "\"" + hijoActual + "\" [label = \"For\"]; ";
+        dot += "\"" + padreDot + "\" -> \"" + hijoActual + "\"; ";
         parea("tk_for", "tk_for", "for", hijoActual)
         parea("tk_parA", "tk_parA", "for", hijoActual)
         let hijoActual1 = "Cuerpo" + iteradorDot
-        dot += "\"" + hijoActual1 + "\" [label = \"Declaracion\"]\n"
-        dot += "\"" + hijoActual + "\" -> \"" + hijoActual1 + "\"\n"  
+        dot += "\"" + hijoActual1 + "\" [label = \"Declaracion\"]; "
+        dot += "\"" + hijoActual + "\" -> \"" + hijoActual1 + "\"; "  
         iteradorDot++
         banderaRange1 = true;
         declaracionFor(hijoActual1)
@@ -860,8 +852,8 @@ function interno(padreDot){
         parea("tk_puntoComa", "tk_puntoComa", "for", hijoActual)
         
         let hijoActual2 = "Cuerpo" + iteradorDot
-        dot += "\"" + hijoActual2 + "\" [label = \"Expresion\"]\n"
-        dot += "\"" + hijoActual + "\" -> \"" + hijoActual2 + "\"\n"  
+        dot += "\"" + hijoActual2 + "\" [label = \"Expresion\"]; "
+        dot += "\"" + hijoActual + "\" -> \"" + hijoActual2 + "\"; "  
         iteradorDot++
         
         banderaRange2 = true;
@@ -870,8 +862,8 @@ function interno(padreDot){
         parea("tk_puntoComa", "tk_puntoComa", "for", hijoActual)
         
         let hijoActual3 = "Cuerpo" + iteradorDot
-        dot += "\"" + hijoActual3 + "\" [label = \"Declaracion\"]\n"
-        dot += "\"" + hijoActual + "\" -> \"" + hijoActual3 + "\"\n"  
+        dot += "\"" + hijoActual3 + "\" [label = \"Declaracion\"]; "
+        dot += "\"" + hijoActual + "\" -> \"" + hijoActual3 + "\"; "  
         iteradorDot++
         
         expresion(hijoActual3)
@@ -880,8 +872,8 @@ function interno(padreDot){
         parea("tk_llaveA", "tk_llaveA", "for", hijoActual)
 
         let hijoActual4 = "Cuerpo" + iteradorDot
-        dot += "\"" + hijoActual4 + "\" [label = \"Interno\"]\n"
-        dot += "\"" + hijoActual + "\" -> \"" + hijoActual4 + "\"\n"  
+        dot += "\"" + hijoActual4 + "\" [label = \"Interno\"]; "
+        dot += "\"" + hijoActual + "\" -> \"" + hijoActual4 + "\"; "  
         iteradorDot++
 
 
@@ -891,43 +883,43 @@ function interno(padreDot){
         interno(padreDot)
     }else if(tokenActual.tipo == "tk_while"){
         let hijoActual = "Cuerpo" + iteradorDot
-        dot += "\"" + hijoActual + "\" [label = \"While\"]\n"
-        dot += "\"" + padreDot + "\" -> \"" + hijoActual + "\"\n"  
+        dot += "\"" + hijoActual + "\" [label = \"While\"]; "
+        dot += "\"" + padreDot + "\" -> \"" + hijoActual + "\"; "  
         iteradorDot++
         parea("tk_while", "tk_while", "while", hijoActual)
         parea("tk_parA", "tk_parA", "while", hijoActual)
         let hijoActual1 = "Cuerpo" + iteradorDot
-        dot += "\"" + hijoActual1 + "\" [label = \"Expresion\"]\n"
-        dot += "\"" + hijoActual + "\" -> \"" + hijoActual1 + "\"\n"  
+        dot += "\"" + hijoActual1 + "\" [label = \"Expresion\"]; "
+        dot += "\"" + hijoActual + "\" -> \"" + hijoActual1 + "\"; "  
         iteradorDot++
         expresion(hijoActual1)
         parea("tk_parC", "tk_parC", "while", hijoActual)
         parea("tk_llaveA", "tk_llaveA", "while", hijoActual)
         let hijoActual2 = "Cuerpo" + iteradorDot
-        dot += "\"" + hijoActual2 + "\" [label = \"Interno\"]\n"
-        dot += "\"" + hijoActual + "\" -> \"" + hijoActual2 + "\"\n"  
+        dot += "\"" + hijoActual2 + "\" [label = \"Interno\"]; "
+        dot += "\"" + hijoActual + "\" -> \"" + hijoActual2 + "\"; "  
         iteradorDot++
         internoCiclo(hijoActual2)
         parea("tk_llaveC", "tk_llaveC", "while", hijoActual)
         interno(padreDot)
     }else if(tokenActual.tipo == "tk_do"){
         let hijoActual = "Cuerpo" + iteradorDot
-        dot += "\"" + hijoActual + "\" [label = \"While\"]\n"
-        dot += "\"" + padreDot + "\" -> \"" + hijoActual + "\"\n"  
+        dot += "\"" + hijoActual + "\" [label = \"While\"]; "
+        dot += "\"" + padreDot + "\" -> \"" + hijoActual + "\"; "  
         iteradorDot++
         parea("tk_do", "tk_do", "dowhile", hijoActual)
         parea("tk_llaveA", "tk_llaveA", "dowhile", hijoActual)
         let hijoActual1 = "Cuerpo" + iteradorDot
-        dot += "\"" + hijoActual1 + "\" [label = \"Interno\"]\n"
-        dot += "\"" + hijoActual + "\" -> \"" + hijoActual1 + "\"\n"  
+        dot += "\"" + hijoActual1 + "\" [label = \"Interno\"]; "
+        dot += "\"" + hijoActual + "\" -> \"" + hijoActual1 + "\"; "  
         iteradorDot++
         internoCiclo(hijoActual1)
         parea("tk_llaveC", "tk_llaveC", "dowhile", hijoActual)
         parea("tk_while", "tk_while", "dowhile", hijoActual)
         parea("tk_parA", "tk_parA", "dowhile", hijoActual)
         let hijoActual2 = "Cuerpo" + iteradorDot
-        dot += "\"" + hijoActual2 + "\" [label = \"Expresion\"]\n"
-        dot += "\"" + hijoActual + "\" -> \"" + hijoActual2 + "\"\n"  
+        dot += "\"" + hijoActual2 + "\" [label = \"Expresion\"]; "
+        dot += "\"" + hijoActual + "\" -> \"" + hijoActual2 + "\"; "  
         iteradorDot++
         expresion(hijoActual2)
         parea("tk_parC", "tk_parC", "dowhile", hijoActual)
@@ -935,39 +927,39 @@ function interno(padreDot){
         interno(padreDot)
     }else if(tokenActual.tipo == "tk_if"){
         let hijoActual = "Cuerpo" + iteradorDot
-        dot += "\"" + hijoActual + "\" [label = \"If\"]\n"
-        dot += "\"" + padreDot + "\" -> \"" + hijoActual + "\"\n"  
+        dot += "\"" + hijoActual + "\" [label = \"If\"]; "
+        dot += "\"" + padreDot + "\" -> \"" + hijoActual + "\"; "  
         iteradorDot++
         parea("tk_if", "tk_if", "if", hijoActual)
         parea("tk_parA", "tk_parA", "if", hijoActual)
         let hijoActual1 = "Cuerpo" + iteradorDot
-        dot += "\"" + hijoActual1 + "\" [label = \"Expresion\"]\n"
-        dot += "\"" + hijoActual + "\" -> \"" + hijoActual1 + "\"\n"  
+        dot += "\"" + hijoActual1 + "\" [label = \"Expresion\"]; "
+        dot += "\"" + hijoActual + "\" -> \"" + hijoActual1 + "\"; "  
         iteradorDot++
         expresion(hijoActual1)
         parea("tk_parC", "tk_parC", "if", hijoActual)
         parea("tk_llaveA", "tk_llaveA", "if", hijoActual)
         let hijoActual2 = "Cuerpo" + iteradorDot
-        dot += "\"" + hijoActual2 + "\" [label = \"Interno\"]\n"
-        dot += "\"" + hijoActual + "\" -> \"" + hijoActual2 + "\"\n"  
+        dot += "\"" + hijoActual2 + "\" [label = \"Interno\"]; "
+        dot += "\"" + hijoActual + "\" -> \"" + hijoActual2 + "\"; "  
         iteradorDot++
         interno(hijoActual2)
         parea("tk_llaveC", "tk_llaveC", "if", hijoActual)
         let hijoActual3 = "Cuerpo" + iteradorDot
-        dot += "\"" + hijoActual3 + "\" [label = \"Else | Else if\"]\n"
-        dot += "\"" + hijoActual + "\" -> \"" + hijoActual3 + "\"\n"  
+        dot += "\"" + hijoActual3 + "\" [label = \"Else | Else if\"]; "
+        dot += "\"" + hijoActual + "\" -> \"" + hijoActual3 + "\"; "  
         iteradorDot++
         ifElse(hijoActual3)
         interno(padreDot)
     }else if(tokenActual.tipo == "tk_return"){
         let hijoActual = "Cuerpo" + iteradorDot
-        dot += "\"" + hijoActual + "\" [label = \"Retorno\"]\n"
-        dot += "\"" + padreDot + "\" -> \"" + hijoActual + "\"\n"  
+        dot += "\"" + hijoActual + "\" [label = \"Retorno\"]; "
+        dot += "\"" + padreDot + "\" -> \"" + hijoActual + "\"; "  
         iteradorDot++
         parea("tk_return", "tk_return", "return", hijoActual)
         let hijoActual1 = "Cuerpo" + iteradorDot
-        dot += "\"" + hijoActual1 + "\" [label = \"Expresion\"]\n"
-        dot += "\"" + hijoActual + "\" -> \"" + hijoActual1 + "\"\n"  
+        dot += "\"" + hijoActual1 + "\" [label = \"Expresion\"]; "
+        dot += "\"" + hijoActual + "\" -> \"" + hijoActual1 + "\"; "  
         iteradorDot++
         tipoReturn(hijoActual1)
         parea("tk_puntoComa", "tk_puntoComa", "return", hijoActual)
@@ -979,7 +971,7 @@ function interno(padreDot){
     || tokenActual.tipo == "tk_double" || tokenActual.tipo == "tk_string" 
     || tokenActual.tipo == "tk_char"){
         declaracion("declaracion", padreDot)
-        interno()
+        interno(padreDot)
     }
 }
 
@@ -1002,8 +994,8 @@ function divPrint(padreDot){
         parea("tk_print", "tk_print", "print", padreDot)
         parea("tk_parA", "tk_parA", "print", padreDot)
         let hijoActual = "Cuerpo" + iteradorDot
-        dot += "\"" + hijoActual + "\" [label = \"Expresion\"]\n"
-        dot += "\"" + padreDot + "\" -> \"" + hijoActual + "\"\n"  
+        dot += "\"" + hijoActual + "\" [label = \"Expresion\"]; "
+        dot += "\"" + padreDot + "\" -> \"" + hijoActual + "\"; "  
         iteradorDot++
         expresion(hijoActual)
         parea("tk_parC", "tk_parC", "print", padreDot)
@@ -1012,8 +1004,8 @@ function divPrint(padreDot){
         parea("tk_println", "tk_println", "print", padreDot)
         parea("tk_parA", "tk_parA", "print", padreDot)
         let hijoActual = "Cuerpo" + iteradorDot
-        dot += "\"" + hijoActual + "\" [label = \"Expresion\"]\n"
-        dot += "\"" + padreDot + "\" -> \"" + hijoActual + "\"\n"  
+        dot += "\"" + hijoActual + "\" [label = \"Expresion\"]; "
+        dot += "\"" + padreDot + "\" -> \"" + hijoActual + "\"; "  
         iteradorDot++
         expresion(hijoActual)
         parea("tk_parC", "tk_parC", "print", padreDot)
@@ -1040,8 +1032,8 @@ function comprobacionElif(padreDot){
     if(tokenActual.tipo == "tk_llaveA"){
         parea("tk_llaveA", "tk_llaveA", "else", padreDot)
         let hijoActual = "Cuerpo" + iteradorDot
-        dot += "\"" + hijoActual + "\" [label = \"Interno\"]\n"
-        dot += "\"" + padreDot + "\" -> \"" + hijoActual + "\"\n"  
+        dot += "\"" + hijoActual + "\" [label = \"Interno\"]; "
+        dot += "\"" + padreDot + "\" -> \"" + hijoActual + "\"; "  
         iteradorDot++
         interno(hijoActual)
         parea("tk_llaveC", "tk_llaveC", "else", padreDot)
@@ -1049,15 +1041,15 @@ function comprobacionElif(padreDot){
         parea("tk_if", "tk_if", "elseif", padreDot)
         parea("tk_parA", "tk_parA", "elseif", padreDot)
         let hijoActual = "Cuerpo" + iteradorDot
-        dot += "\"" + hijoActual + "\" [label = \"Expresion\"]\n"
-        dot += "\"" + padreDot + "\" -> \"" + hijoActual + "\"\n"  
+        dot += "\"" + hijoActual + "\" [label = \"Expresion\"]; "
+        dot += "\"" + padreDot + "\" -> \"" + hijoActual + "\"; "  
         iteradorDot++
         expresion(hijoActual)
         parea("tk_parC", "tk_parC", "elseif", padreDot)
         parea("tk_llaveA", "tk_llaveA", "elseif", padreDot)
         let hijoActual1 = "Cuerpo" + iteradorDot
-        dot += "\"" + hijoActual1 + "\" [label = \"Interno\"]\n"
-        dot += "\"" + padreDot + "\" -> \"" + hijoActual1 + "\"\n"  
+        dot += "\"" + hijoActual1 + "\" [label = \"Interno\"]; "
+        dot += "\"" + padreDot + "\" -> \"" + hijoActual1 + "\"; "  
         iteradorDot++
         interno(hijoActual1)
         parea("tk_llaveC", "tk_llaveC", "elseif", padreDot)
@@ -1115,8 +1107,8 @@ function divLlamadoAsignacion(padreDot){
     if (tokenActual.tipo == "tk_parA"){
         parea("tk_parA", "tk_parA", "asignacion", padreDot)
         let hijoActual = "Cuerpo" + iteradorDot
-        dot += "\"" + hijoActual + "\" [label = \"Parametros\"]\n"
-        dot += "\"" + padreDot + "\" -> \"" + hijoActual + "\"\n"  
+        dot += "\"" + hijoActual + "\" [label = \"Parametros\"]; "
+        dot += "\"" + padreDot + "\" -> \"" + hijoActual + "\"; "  
         iteradorDot++
         parametrosLlamada(hijoActual)
         parea("tk_parC", "tk_parC", "asignacion", padreDot)
@@ -1124,8 +1116,8 @@ function divLlamadoAsignacion(padreDot){
     }else if(tokenActual.tipo == "tk_igual"){
         parea("tk_igual", "tk_igual", "asginacion", padreDot)
         let hijoActual = "Cuerpo" + iteradorDot
-        dot += "\"" + hijoActual + "\" [label = \"Expresion\"]\n"
-        dot += "\"" + padreDot + "\" -> \"" + hijoActual + "\"\n"  
+        dot += "\"" + hijoActual + "\" [label = \"Expresion\"]; "
+        dot += "\"" + padreDot + "\" -> \"" + hijoActual + "\"; "  
         iteradorDot++
         expresion(hijoActual)
         parea("tk_puntoComa", "tk_puntoComa", "asignacion", padreDot)
@@ -1137,8 +1129,8 @@ function divLlamadoAsignacion(padreDot){
 function llamadoAsignacion(padreDot){
     if(tokenActual.tipo == "tk_identificador"){
         let hijoActual = "Cuerpo" + iteradorDot
-        dot += "\"" + hijoActual + "\" [label = \"Llamado | Asignacion\"]\n"
-        dot += "\"" + padreDot + "\" -> \"" + hijoActual + "\"\n"  
+        dot += "\"" + hijoActual + "\" [label = \"Llamado | Asignacion\"]; "
+        dot += "\"" + padreDot + "\" -> \"" + hijoActual + "\"; "  
         iteradorDot++
         parea("tk_identificador", "tk_identificador", "asignacion", hijoActual)
         divLlamadoAsignacion(hijoActual)    
@@ -1151,7 +1143,7 @@ function declaracionFor(padreDot){
     if(tokenActual.tipo == "tk_int" || tokenActual.tipo == "tk_boolean" 
     || tokenActual.tipo == "tk_double" || tokenActual.tipo == "tk_string" 
     || tokenActual.tipo == "tk_char"){
-        tipo("forRange", padreDot)
+        tipo("", padreDot)
         identificadorDeclaracionFor(padreDot)
     }else{
         parea("tk_error", "tk_tipo")
@@ -1272,8 +1264,9 @@ function expresionPrima(padreDot){
 
 function parea(preAnalisis, esperado, contexto, padreDot){
     if (preAnalisis == tokenActual.tipo){
-        dot += "\"" + tokenActual.tipo +  tokenActual.fila + tokenActual.columna + "\" [label = \""+tokenActual.valor+"\"]\n"
-        dot += padreDot +" -> "+ "\"" + tokenActual.tipo + tokenActual.fila + tokenActual.columna + "\"\n"
+        banderaError = false;
+        dot += "\"" + tokenActual.tipo +  tokenActual.fila + tokenActual.columna + "\" [label = \""+tokenActual.valor+"\"]; "
+        dot += "\"" + padreDot +"\" -> "+ "\"" + tokenActual.tipo + tokenActual.fila + tokenActual.columna + "\"; "
         traduccion(tokenActual, contexto)
         iteradorSintactico++
         if (iteradorSintactico < listaTokens.length){
@@ -1283,16 +1276,17 @@ function parea(preAnalisis, esperado, contexto, padreDot){
         listadoErroresSintacticos.push({encontrado: tokenActual.tipo, esperado: esperado, 
             fila: tokenActual.fila, columna: tokenActual.columna})
         while(true){
-            if(tokenActual.tipo == "tk_puntoComa" || tokenActual.tipo == "tk_llaveA"){
-                break
+            if(tokenActual.tipo == "tk_puntoComa"){
+                break;
             }
             iteradorSintactico++
             if (iteradorSintactico < listaTokens.length){
                 tokenActual = listaTokens[iteradorSintactico]
             }else{
-                break
+                break;
             }
         }
+        banderaError = true;
     }
 }
 
@@ -1357,19 +1351,19 @@ function traduccion(tokenTraducir, contexto){
             }
         }else if(tokenTraducir.tipo == "tk_stringTexto"){
             if(banderaRange1){
-                range1 += tokenTraducir.valor
+                range1 += "\"" + tokenTraducir.valor + "\""
             }else if(banderaRange2){
-                range2 += tokenTraducir.valor
+                range2 += "\"" + tokenTraducir.valor + "\""
             }else{
-                traducido += tokenTraducir.valor
+                traducido += "\"" + tokenTraducir.valor + "\""
             }
         }else if(tokenTraducir.tipo == "tk_charTexto"){
             if(banderaRange1){
-                range1 += tokenTraducir.valor
+                range1 += "\'" + tokenTraducir.valor + "\'"
             }else if(banderaRange2){
-                range2 += tokenTraducir.valor
+                range2 += "\'" + tokenTraducir.valor + "\'"
             }else{
-                traducido += tokenTraducir.valor
+                traducido += "\'" + tokenTraducir.valor + "\'"
             }
         }else if(tokenTraducir.tipo == "tk_numero"){
             if(banderaRange1){
@@ -1691,24 +1685,23 @@ function traduccion(tokenTraducir, contexto){
         }else if(tokenTraducir.tipo == "tk_false"){
             traducido += " False "
         }else if(tokenTraducir.tipo == "tk_stringTexto"){
-            traducido += tokenTraducir.valor
+            traducido += "\"" + tokenTraducir.valor + "\""
         }else if(tokenTraducir.tipo == "tk_charTexto"){
-            traducido += tokenTraducir.valor
+            traducido += "\'" + tokenTraducir.valor + "\'"
         }else if(tokenTraducir.tipo == "tk_coma"){
             traducido += ", "
         }
     }else if(contexto == "for"){
         if(tokenTraducir.tipo == "tk_for"){
-            traducido += tabulados + "for"
+            traducido += tabulados + "for "
         }else if(tokenTraducir.tipo == "tk_llaveA"){
             traducido += ":\n"
             tabulados += "\t"
-            console.log(tabulados.length)
         }else if(tokenTraducir.tipo == "tk_llaveC"){
             tabulados = tabulados.substring(0, tabulados.length - 1)
-            console.log(tabulados.length)
             traducido += "\n"
         }else if(tokenTraducir.tipo == "tk_parC"){
+            console.log(identificadorFor)
             traducido += identificadorFor + " in range (" + range1 + ", " + range2 + ")"
             identificadorFor = ""
             range2 = ""

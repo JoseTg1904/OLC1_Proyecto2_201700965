@@ -2,7 +2,7 @@
 
 ## *Autómata finito determinista*
 
-![AFD Java](AFD_Proyecto2.png)
+![AFD Java](Imagenes/AFD_proyecto2.png)
 
 ## *Expresiones regulares en jison*
 ---
@@ -93,7 +93,8 @@ V = { <Inicio>, <PublicoInterClas>, <InterClas>, <Definicion>, <Instrucciones>,
 <TipoFuncion>, <Parametros>, <Tipo>, <ListadoParametros>, <Implementacion>, 
 <Declaracion>, <IdentificadorDeclaracion>, <ListadoDeclaracion>, <expresion>, <divTipoFuncion>, 
 <interno>, <LlamadoAsignacion>, <divPrint>, <DeclaracionFor>, <internoCiclo>, 
-<ifElse>, <tipoReturn>, <comprobacionElif>, <ParametrosLlamado>, <ListadoDeclaracionParametrosLlamado>, <divLlamadoAsignacion>, <DeclaracionFor>, <IdentificadorDeclaracionFor> }
+<ifElse>, <tipoReturn>, <comprobacionElif>, <ParametrosLlamado>, <ListadoDeclaracionParametrosLlamado>, 
+<divLlamadoAsignacion>, <DeclaracionFor>, <IdentificadorDeclaracionFor> }
 
 T = { tk_public, tk_interface, tk_identificador, tk_class, "{", "}", "(", ")", 
 ";", tk_void, tk_int, tk_boolean, tk_double, tk_string, tk_char, ",", 
@@ -215,7 +216,8 @@ V = { <Inicio>, <PublicoInterClas>, <InterClas>, <Definicion>, <Instrucciones>,
 <TipoFuncion>, <Parametros>, <Tipo>, <ListadoParametros>, <Implementacion>, 
 <Declaracion>, <IdentificadorDeclaracion>, <ListadoDeclaracion>, <expresion>, <divTipoFuncion>, 
 <interno>, <LlamadoAsignacion>, <divPrint>, <DeclaracionFor>, <internoCiclo>, 
-<ifElse>, <tipoReturn>, <comprobacionElif>, <ParametrosLlamado>, <ListadoDeclaracionParametrosLlamado>, <divLlamadoAsignacion>, <DeclaracionFor>, <IdentificadorDeclaracionFor>, <expresionPrima> }
+<ifElse>, <tipoReturn>, <comprobacionElif>, <ParametrosLlamado>, <ListadoDeclaracionParametrosLlamado>, 
+<divLlamadoAsignacion>, <DeclaracionFor>, <IdentificadorDeclaracionFor>, <expresionPrima> }
 
 T = { tk_public, tk_interface, tk_identificador, tk_class, "{", "}", "(", ")", 
 ";", tk_void, tk_int, tk_boolean, tk_double, tk_string, tk_char, ",", 

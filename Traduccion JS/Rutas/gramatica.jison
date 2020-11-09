@@ -4,6 +4,7 @@ var listaTokens = [];
 var listaErroresLexicos = [];
 var listaErroresSintacticos = [];
 var traduccion = "";
+var tabulados = "";
 %}
 
 /*Parte lexica*/
@@ -12,12 +13,12 @@ var traduccion = "";
 %%
 
 /*Expresiones regulares para la aceptacion de numeros enteros y decimales*/
+[0-9]+("."[0-9]+)\b {listaTokens.push({tipo: "tk_decimal", valor: yytext, 
+                        fila: yylloc.first_line, columna: yylloc.first_column});
+                        return "tk_decimal";}
 [0-9]+\b            {listaTokens.push({tipo: "tk_numero", valor: yytext, 
                         fila: yylloc.first_line, columna: yylloc.first_column});
                         return "tk_numero";}
-[0-9]+("."[0-9]+)\b {listaTokens.push({tipo: "tk_numero", valor: yytext, 
-                        fila: yylloc.first_line, columna: yylloc.first_column});
-                        return "tk_decimal";}
 
 /*conjunto de palabras reservadas*/
 "public"        {listaTokens.push({tipo: "tk_public", valor: yytext, 
@@ -98,6 +99,10 @@ var traduccion = "";
 "print"         {listaTokens.push({tipo: "tk_print", valor: yytext, 
                 fila: yylloc.first_line, columna: yylloc.first_column});
                 return "tk_print";}
+
+/*expresiones para comentarios individuales y multiples*/
+"//".*                          {}
+[/][*][^*]*[*]+([^/*][^*]*[*]+)*[/]     {}
 
 /*conjunto de simbolos aceptados*/
 "{"     {listaTokens.push({tipo: "tk_llaveA", valor: yytext, 
@@ -193,14 +198,6 @@ var traduccion = "";
                 fila: yylloc.first_line, columna: yylloc.first_column});
                 return "tk_charTexto";}
                 
-/*expresiones para comentarios individuales y multiples*/
-"//".*                                  {yytext = yytext.substr(1, yylen-2);
-                                        listaTokens.push({tipo: "tk_comentarioIndividual", 
-                                        valor: yytext, fila: yylloc.first_line, columna: yylloc.first_column});}
-[/][*][^*]*[*]+([^/*][^*]*[*]+)*[/]     {yytext = yytext.substr(1, yylen-2);
-                                        listaTokens.push({tipo: "tk_comentarioMultiple", 
-                                        valor: yytext, fila: yylloc.first_line, columna: yylloc.first_column});}
-
 /*expresion para un identificador*/
 [a-zA-Z]([a-zA-Z0-9_])* {listaTokens.push({tipo: "tk_identificador", 
                         valor: yytext, fila: yylloc.first_line, columna: yylloc.first_column});
@@ -220,70 +217,75 @@ pero todo esto se ignora
 
 /lex
 
+/*Precedencia de operadores, de menor a mayor*/
+%left tk_mas tk_menos
+%left tk_por tk_division
+%left tk_parA tk_parC
+%left tk_mayor tk_menor
+%left tk_mayorIgual tk_menorIgual
+%left tk_igualacion tk_distinto
+%left tk_not tk_and tk_or tk_xor
+%left tk_adicion tk_sustraccion
+
 /*Parte sintactica*/
 %start Inicio
 %%
 
 Inicio 
-        : PublicoInterClas EOF { var retorno = {tokens: listaTokens, erroresLexicos: listaErroresLexicos,
+        : PublicoInterClas EOF {console.log("en jison\n" + $1 + $2);
+                                var retorno = {tokens: listaTokens, erroresLexicos: listaErroresLexicos,
                                 erroresSintacticos: listaErroresSintacticos, traducido: traduccion};
                                 listaTokens = [];
                                 listaErroresLexicos = [];
                                 listaErroresSintacticos = [];
                                 traduccion = "";
+                                tabulados = "";
                                 return retorno;};
 
 PublicoInterClas 
-                : tk_public InterClas 
-                | ;
+                : tk_public InterClas {traduccion += $2; $$ = $2}
+                | {traduccion += ""; $$ = ""};
 
 InterClas 
-        : tk_interface tk_identificador tk_llaveA Definicion tk_llaveC PublicoInterClas 
-        | tk_class tk_identificador tk_llaveA Instrucciones tk_llaveC PublicoInterClas {traduccion += $1;
-                                                                                        traduccion += " " + $2;
-                                                                                        traduccion += $3 + "\n";
-                                                                                        traduccion += $4;
-                                                                                        traduccion += "\n" + $5 + "\n";}
-        | error tk_llaveC {listaErroresSintacticos.push({encontrado: yytext, 
-        esperado: "error en la definicion de clase o interfaz",
-        fila: this._$.first_line, columna: this._$.first_column})};
+        : tk_interface tk_identificador tk_llaveA Definicion tk_llaveC PublicoInterClas {$$ = "";}
+        | tk_class tk_identificador tk_llaveA Instrucciones tk_llaveC PublicoInterClas {$$ = $1 + " " + $2 + $3 + "\n" + $4 + $5 + "\n";};
 
 Definicion 
-        : tk_public TipoFuncionDef tk_identificador tk_parA ParametrosDef tk_parC tk_puntoComa Definicion 
+        : tk_public TipoFuncionDef tk_identificador tk_parA ParametrosDef tk_parC tk_puntoComa Definicion {$$ = ""}
         | 
         | error tk_puntoComa {listaErroresSintacticos.push({encontrado: yytext, 
         esperado: "error en la definicion de metodos o funciones",
         fila: this._$.first_line, columna: this._$.first_column})};
 
 TipoFuncionDef
-        : TipoFuncionDefIn
-        | tk_void;
+        : TipoFuncionDefIn {$$ = ""}
+        | tk_void {$$ = ""};
 
 TipoFuncionDefIn
-        : tk_int 
-        | tk_boolean 
-        | tk_double 
-        | tk_string 
-        | tk_char;
+        : tk_int {$$ = ""}
+        | tk_boolean {$$ = ""}
+        | tk_double {$$ = ""}
+        | tk_string {$$ = ""}
+        | tk_char {$$ = ""};
 
 TipoFuncion 
-        : Tipo 
-        | tk_void;
+        : Tipo {$$ = ""}
+        | tk_void {$$ = ""};
 
 Tipo
-        : tk_int
-        | tk_boolean
-        | tk_double
-        | tk_string
-        | tk_char;
+        : tk_int {$$ = ""}
+        | tk_boolean {$$ = ""}
+        | tk_double {$$ = ""}
+        | tk_string {$$ = ""}
+        | tk_char {$$ = ""};  
 
 ParametrosDef
-        : TipoFuncionDefIn tk_identificador ListadoParametrosDef
-        | ;
+        : TipoFuncionDefIn tk_identificador ListadoParametrosDef {$$ = ""}
+        | {$$ = ""};
 
 ListadoParametrosDef
-        : tk_coma ParametrosDef 
-        | ;
+        : tk_coma ParametrosDef {$$ = ""}
+        | {$$ = ""};
 
 Parametros 
         : Tipo tk_identificador ListadoParametros {$$ = "var " + $2 + $3}
@@ -312,65 +314,67 @@ ListadoDeclaracion
         | tk_coma IdentificadorDeclaracion {$$ = $1 + " " + $2}
         | {$$ = ""};
 
-expresion 
-        : tk_menos expresion expresionPrima {$$ = $1 + " " + $2 + $3;}
-        | tk_not expresion expresionPrima {$$ = $1 + " " + $2 + $3;}
-        | tk_stringTexto expresionPrima {$$ = $1 + " " + $2;}
-        | tk_charTexto expresionPrima {$$ = $1 + " " + $2;}
-        | tk_numero expresionPrima {$$ = $1 + " " + $2;}
-        | tk_decimal expresionPrima {$$ = $1 + " " + $2;}
-        | tk_identificador expresionPrima {$$ = $1 + " " + $2;}
-        | tk_true expresionPrima {$$ = $1 + " " + $2;}
-        | tk_false expresionPrima {$$ = $1 + " " + $2;}
-        | tk_parA expresion tk_parC expresionPrima {$$ = $1 + $2 + $3 + $4;};
+Declaracion1 
+        : Tipo IdentificadorDeclaracion1 tk_puntoComa {$$ = "var " + $2 + $3 + "\n";};
 
-expresionPrima 
-        : tk_and expresion expresionPrima {$$ = $1 + " " + $2 + $3;}
-        | tk_or expresion expresionPrima {$$ = $1 + " " + $2 + $3;}
-        | tk_xor expresion expresionPrima {$$ = $1 + " " + $2 + $3;}
-        | tk_adicion expresionPrima {$$ = $1 + " " + $2;}
-        | tk_sustraccion expresionPrima {$$ = $1 + " " + $2;}
-        | tk_mayor expresion expresionPrima {$$ = $1 + " " + $2 + $3;}
-        | tk_menor expresion expresionPrima {$$ = $1 + " " + $2 + $3;}
-        | tk_mayorIgual expresion expresionPrima {$$ = $1 + " " + $2 + $3;}
-        | tk_menorIgual expresion expresionPrima {$$ = $1 + " " + $2 + $3;}
-        | tk_igualacion expresion expresionPrima {$$ = $1 + " " + $2 + $3;}
-        | tk_distinto expresion expresionPrima {$$ = $1 + " " + $2 + $3;}
-        | tk_mas expresion expresionPrima {$$ = $1 + " " + $2 + $3;}
-        | tk_menos expresion expresionPrima {$$ = $1 + " " + $2 + $3;}
-        | tk_por expresion expresionPrima {$$ = $1 + " " + $2 + $3;}
-        | tk_division expresion expresionPrima {$$ = $1 + " " + $2 + $3;}
-        | {$$ = "";};
-        
+IdentificadorDeclaracion1 
+        : tk_identificador ListadoDeclaracion1 {$$ = $1 + $2};
+
+ListadoDeclaracion1 
+        : tk_igual expresion ListadoDeclaracion1 { $$ = " " + $1 + " " + $2 + $3;}
+        | tk_coma IdentificadorDeclaracion1 {$$ = $1 + " " + $2}
+        | {$$ = ""};
+
+expresion : expresion tk_mas expresion  {$$ = $1 + " " + $2 + " " +  $3;}
+        | expresion tk_menos expresion {$$ = $1 + " " + $2 + " " +  $3;}
+        | expresion tk_por expresion {$$ = $1 + " " + $2 + " " +  $3;}
+        | expresion tk_division expresion {$$ = $1 + " " + $2 + " " +  $3;}
+        | tk_menos expresion {$$ = $1 + " " + $2;}
+        | expresion tk_mayor expresion {$$ = $1 + " " + $2 + " " +  $3;}
+        | expresion tk_menor expresion {$$ = $1 + " " + $2 + " " +  $3;}
+        | expresion tk_mayorIgual expresion {$$ = $1 + " " + $2 + " " +  $3;}
+        | expresion tk_menorIgual expresion {$$ = $1 + " " + $2 + " " +  $3;}
+        | expresion tk_igualacion expresion {$$ = $1 + " " + $2 + " " +  $3;}
+        | expresion tk_distinto expresion {$$ = $1 + " " + $2 + " " +  $3;}
+        | tk_not expresion {$$ = $1 + " " + $2;}
+        | expresion tk_and expresion {$$ = $1 + " " + $2 + " " +  $3;}
+        | expresion tk_or expresion {$$ = $1 + " " + $2 + " " +  $3;}
+        | expresion tk_xor expresion {$$ = $1 + " " + $2 + " " +  $3;}
+        | expresion tk_adicion {$$ = $1 + " " + $2;}
+        | expresion tk_sustraccion {$$ = $1 + " " + $2;}
+        | tk_stringTexto {$$ = $1;}
+        | tk_charTexto {$$ = $1;}
+        | tk_numero {$$ = $1;}
+        | tk_decimal {$$ = $1;}
+        | tk_identificador {$$ = $1;}
+        | tk_true {$$ = $1;}
+        | tk_false {$$ = $1;}
+        | tk_parA expresion tk_parC {$$ = $1 + $2 + $3};
+
 Implementacion 
         : tk_public divTipoFuncion {$$ = $2};
 
 divTipoFuncion 
-        : TipoFuncion tk_identificador tk_parA Parametros tk_parC tk_llaveA interno tk_llaveC {$$ = "function " + $2 + $3 + $4 + $5 + $6 + "\n" + $7 + "\n" + $8 + "\n";}
-        | tk_static tk_void tk_main tk_parA tk_string tk_corcheteA tk_corcheteC tk_args tk_parC tk_llaveA interno tk_llaveC {$$ = "function main()" + $10 + "\n" + $11 + "\n" + $12 + "\n";} 
-        | error tk_llaveC {listaErroresSintacticos.push({encontrado: yytext, 
-        esperado: "error en la implementacion de funciones",
-        fila: this._$.first_line, columna: this._$.first_column})};
+        : TipoFuncion tk_identificador tk_parA Parametros tk_parC tk_llaveA interno tk_llaveC {$$ = "function " + $2 + $3 + $4 + $5 + $6 + "\n" + $7 + $8 + "\n";}
+        | tk_static tk_void tk_main tk_parA tk_string tk_corcheteA tk_corcheteC tk_args tk_parC tk_llaveA interno tk_llaveC {$$ = "function main()" + $10 + "\n" + $11 + $12 + "\n";};
+
 
 interno 
-        : Declaracion interno {$$ = $1 + $2;}
-        | LlamadoAsignacion interno {$$ = $1 + $2;}
-        | tk_system tk_punto tk_out tk_punto divPrint interno {$$ = $5 + $6;}
-        | internoLlave {$$ = $1;}
+        : internoLlave {$$ = $1;}
         | internoPunto {$$ = $1;}
         | {$$ = "";};
 
 internoLlave
         : tk_for tk_parA DeclaracionFor tk_puntoComa expresion tk_puntoComa expresion tk_parC tk_llaveA internoCiclo tk_llaveC interno {$$ = $1 + $2 + $3 + $4 + " " + $5 + $6 + " " + $7 + $8 + $9 + "\n" + $10 + "\n" + $11 + "\n" + $12;}
         | tk_while tk_parA expresion tk_parC tk_llaveA internoCiclo tk_llaveC interno {$$ = $1 + $2 + $3 + $4 + $5 + "\n" + $6 + "\n" + $7 + "\n" + $8;}
-        | tk_if tk_parA expresion tk_parC tk_llaveA interno tk_llaveC ifElse interno {$$ = $1 + $2 + $3 + $4 + $5 + "\n" + $6 + "\n" + $7 + $8 + "\n" + $9;}
-        | error tk_llaveC {listaErroresSintacticos.push({encontrado: yytext, 
-        esperado: "error en la definicion de for, while o if",
-        fila: this._$.first_line, columna: this._$.first_column})};
+        | tk_if tk_parA expresion tk_parC tk_llaveA interno tk_llaveC ifElse interno {$$ = $1 + $2 + $3 + $4 + $5 + "\n" + $6 + "\n" + $7 + $8 + "\n" + $9;};
 
 internoPunto
         : tk_return tipoReturn tk_puntoComa interno {$$ = $1 + " " + $2 + $3 + "\n" + $4;}
         | tk_do tk_llaveA internoCiclo tk_llaveC tk_while tk_parA expresion tk_parC tk_puntoComa interno {$$ = $1 + $2 + "\n" + $3 + "\n" + $4 + $5 + $6 + $7 + $8 + $9 + "\n" + $10;}
+        | Declaracion1 interno {$$ = $1 + $2;}
+        | tk_system tk_punto tk_out tk_punto divPrint interno {$$ = $5 + $6;}
+        | LlamadoAsignacion interno {$$ = $1 + $2;}
         | error tk_puntoComa {listaErroresSintacticos.push({encontrado: yytext, 
         esperado: "error en la definicion de return o do while",
         fila: this._$.first_line, columna: this._$.first_column})};
@@ -385,25 +389,19 @@ ifElse
 
 comprobacionElif 
         : tk_llaveA interno tk_llaveC {$$ = $1 + "\n" + $2 + "\n" + $3 + "\n";}
-        | tk_if tk_parA expresion tk_parC tk_llaveA interno tk_llaveC ifElse {$$ = $1 + $2 + $3 + $4 + $5 + "\n" + $6 + "\n" + $7 + "\n" + $8;}
-        | error tk_llaveC {listaErroresSintacticos.push({encontrado: yytext, 
-        esperado: "error en la definicion de else o else if",
-        fila: this._$.first_line, columna: this._$.first_column})};
+        | tk_if tk_parA expresion tk_parC tk_llaveA interno tk_llaveC ifElse {$$ = " " + $1 + $2 + $3 + $4 + $5 + "\n" + $6 + "\n" + $7 + "\n" + $8;};
 
 divPrint 
         : tk_print tk_parA expresion tk_parC tk_puntoComa {$$ = "console.log" + $2 + $3 + $4 + $5 + "\n";}
-        | tk_println tk_parA expresion tk_parC tk_puntoComa {$$ = "console.log" + $2 + $3 + $4 + $5 + "\n";}
-        | error tk_puntoComa {listaErroresSintacticos.push({encontrado: yytext, 
-        esperado: "error en la definicion de impresion en consola",
-        fila: this._$.first_line, columna: this._$.first_column})};
+        | tk_println tk_parA expresion tk_parC tk_puntoComa {$$ = "console.log" + $2 + $3 + $4 + $5 + "\n";};
 
 internoCiclo 
         : interno {$$ = $1;}
-        | tk_break tk_puntoComa internoCiclo {$$ = $1 + $2 + "\n" + $3;}
-        | tk_continue tk_puntoComa internoCiclo {$$ = $1 + $2 + "\n" + $3;}
-        | error tk_puntoComa {listaErroresSintacticos.push({encontrado: yytext, 
-        esperado: "error en break o continue",
-        fila: this._$.first_line, columna: this._$.first_column})};
+        | internasCiclo {$$ = $1;};
+
+internasCiclo
+        : tk_break tk_puntoComa internoCiclo {$$ = $1 + $2 + "\n" + $3;}
+        | tk_continue tk_puntoComa internoCiclo {$$ = $1 + $2 + "\n" + $3;};
 
 ParametrosLlamado 
         : tk_identificador ListadoDeclaracionParametrosLlamado {$$ = $1 + $2;}
@@ -423,13 +421,7 @@ LlamadoAsignacion
 
 divLlamadoAsignacion 
         : tk_parA ParametrosLlamado tk_parC tk_puntoComa {$$ = $1 + $2 + $3 + $4 + "\n";}
-        | tk_igual expresion tk_puntoComa {$$ = $1 + $2 + $3 + "\n";}
-        | error tk_puntoComa {listaErroresSintacticos.push({encontrado: yytext, 
-        esperado: "error en la la llamada de metodos, funciones o asignacion de variables",
-        fila: this._$.first_line, columna: this._$.first_column})};
+        | tk_igual expresion tk_puntoComa {$$ = $1 + $2 + $3 + "\n";};
 
 DeclaracionFor 
-        : Tipo IdentificadorDeclaracionFor {$$ = "var " + $2;};
-
-IdentificadorDeclaracionFor
-        : tk_identificador tk_igual expresion {$$ = $1 + " " + $2 + " " + $3;};
+        : Tipo tk_identificador tk_igual expresion {$$ = "var " + $2 + $3 + $4;};

@@ -31,7 +31,7 @@ router.post("/traducirJS", (req, res) => {
     traduccion = retorno.traducido;
 
     /*Impresion para ver la traduccion*/
-    console.error(traduccion)
+    //console.error(traduccion)
 
     /*Envio de los resultados del analisis*/
     res.json({erroresLexicos: listaErroresLexicos,

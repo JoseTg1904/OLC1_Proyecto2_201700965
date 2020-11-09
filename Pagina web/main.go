@@ -140,12 +140,25 @@ func traducirPython(escritor http.ResponseWriter, lector *http.Request) {
 }
 
 func mostrarArbol(dot string) {
+	fmt.Println("DOT\n", dot)
 	archivoSalida, _ := os.Create("./Reportes/Arbol.dot")
 	archivoSalida.WriteString(dot)
 	archivoSalida.Close()
-	exec.Command("dot", "./Reportes/Arbol.dot", "-Tpng", "-o", "./Reportes/Arbol.png").Run()
+	exec.Command("dot", "./Reportes/Arbol.dot", "-Tpng", "-o", "./Reportes/Arbol.png").Output()
 	htmlSalida, _ := os.Create("Arbol.html")
-	salida := "<html>\n<title>Arbol de analisis sintactico</title>\n<img src = \"Reportes/Arbol.png\">\n</html>"
+
+	salida := `<!DOCTYPE html>
+	<meta charset = "utf-8">
+	<script src = "//d3js.org/d3.v5.min.js"></script>
+	<script src = "https://unpkg.com/@hpcc-js/wasm@0.3.11/dist/index.min.js"></script>
+	<script src = "https://unpkg.com/d3-graphviz@3.0.5/build/d3-graphviz"></script>
+	<div id = "graph" style = "text-align: center;"></div>
+	<script>
+	d3.select("#graph").graphviz()
+		.renderDot('` + dot + `');
+	</script>
+	`
+	//salida := "<html>\n<title>Arbol de analisis sintactico</title>\n<img src = \"Reportes/Arbol.png\">\n</html>"
 	htmlSalida.WriteString(salida)
 	htmlSalida.Close()
 }

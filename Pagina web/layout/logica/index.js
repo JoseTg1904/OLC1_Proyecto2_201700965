@@ -84,6 +84,7 @@ function respuestaJS(respuesta){
     document.getElementById("consolaJS").value = textoConsola
 
     traducidoJS = respuesta.traducido;
+    console.log(traducidoJS);
 }
 
 function abrirReportes(tipoReporte){
@@ -141,6 +142,7 @@ function respuestaPython(respuesta){
     document.getElementById("consolaPython").value = textoConsola
 
     traducidoPython = respuesta.traduccion;
+    console.log(traducidoPython);
 }
 
 function descargarTraduccionJS(){
