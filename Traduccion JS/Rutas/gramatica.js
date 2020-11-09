@@ -1034,32 +1034,40 @@ case 54:listaTokens.push({tipo: "tk_stringTexto", valor: yy_.yytext,
                 fila: yy_.yylloc.first_line, columna: yy_.yylloc.first_column});
                 return "tk_stringTexto";
 break;
-case 55:listaTokens.push({tipo: "tk_charTexto", valor: yy_.yytext, 
+case 55:listaTokens.push({tipo: "tk_stringTexto", valor: yy_.yytext, 
+                fila: yy_.yylloc.first_line, columna: yy_.yylloc.first_column});
+                return "tk_stringTexto";
+break;
+case 56:listaTokens.push({tipo: "tk_charTexto", valor: yy_.yytext, 
                 fila: yy_.yylloc.first_line, columna: yy_.yylloc.first_column});
                 return "tk_charTexto";
 break;
-case 56:yy_.yytext = yy_.yytext.substr(1, yylen-2);
+case 57:listaTokens.push({tipo: "tk_charTexto", valor: yy_.yytext, 
+                fila: yy_.yylloc.first_line, columna: yy_.yylloc.first_column});
+                return "tk_charTexto";
+break;
+case 58:yy_.yytext = yy_.yytext.substr(1, yylen-2);
                                         listaTokens.push({tipo: "tk_comentarioIndividual", 
                                         valor: yy_.yytext, fila: yy_.yylloc.first_line, columna: yy_.yylloc.first_column});
 break;
-case 57:yy_.yytext = yy_.yytext.substr(1, yylen-2);
+case 59:yy_.yytext = yy_.yytext.substr(1, yylen-2);
                                         listaTokens.push({tipo: "tk_comentarioMultiple", 
                                         valor: yy_.yytext, fila: yy_.yylloc.first_line, columna: yy_.yylloc.first_column});
 break;
-case 58:listaTokens.push({tipo: "tk_identificador", 
+case 60:listaTokens.push({tipo: "tk_identificador", 
                         valor: yy_.yytext, fila: yy_.yylloc.first_line, columna: yy_.yylloc.first_column});
                         return "tk_identificador";
 break;
-case 59:return "EOF";
+case 61:return "EOF";
 break;
-case 60:
+case 62:
 break;
-case 61:listaErroresLexicos.push({valor: yy_.yytext, fila: yy_.yylloc.first_line, columna: yy_.yylloc.first_column});
+case 63:listaErroresLexicos.push({valor: yy_.yytext, fila: yy_.yylloc.first_line, columna: yy_.yylloc.first_column});
 break;
 }
 },
-rules: [/^(?:[0-9]+\b)/i,/^(?:[0-9]+(\.[0-9]+)\b)/i,/^(?:public\b)/i,/^(?:true\b)/i,/^(?:false\b)/i,/^(?:class\b)/i,/^(?:interface\b)/i,/^(?:void\b)/i,/^(?:for\b)/i,/^(?:while\b)/i,/^(?:do\b)/i,/^(?:if\b)/i,/^(?:else\b)/i,/^(?:break\b)/i,/^(?:continue\b)/i,/^(?:return\b)/i,/^(?:int\b)/i,/^(?:boolean\b)/i,/^(?:double\b)/i,/^(?:string\b)/i,/^(?:char\b)/i,/^(?:static\b)/i,/^(?:main\b)/i,/^(?:args\b)/i,/^(?:system\b)/i,/^(?:out\b)/i,/^(?:print\b)/i,/^(?:println\b)/i,/^(?:\{)/i,/^(?:\})/i,/^(?:\()/i,/^(?:\))/i,/^(?:,)/i,/^(?:;)/i,/^(?:\^)/i,/^(?:\*)/i,/^(?:\.)/i,/^(?:\[)/i,/^(?:\])/i,/^(?:>)/i,/^(?:>=)/i,/^(?:<)/i,/^(?:<=)/i,/^(?:=)/i,/^(?:==)/i,/^(?:!)/i,/^(?:!=)/i,/^(?:&&)/i,/^(?:\|\|)/i,/^(?:\+\+)/i,/^(?:\+)/i,/^(?:--)/i,/^(?:-)/i,/^(?:\/)/i,/^(?:"[^\"]*")/i,/^(?:'[^\']*')/i,/^(?:\/\/.*)/i,/^(?:[/][*][^*]*[*]+([^/*][^*]*[*]+)*[/])/i,/^(?:[a-zA-Z]([a-zA-Z0-9_])*)/i,/^(?:$)/i,/^(?:[ \t\r\n\f])/i,/^(?:.)/i],
-conditions: {"INITIAL":{"rules":[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61],"inclusive":true}}
+rules: [/^(?:[0-9]+\b)/i,/^(?:[0-9]+(\.[0-9]+)\b)/i,/^(?:public\b)/i,/^(?:true\b)/i,/^(?:false\b)/i,/^(?:class\b)/i,/^(?:interface\b)/i,/^(?:void\b)/i,/^(?:for\b)/i,/^(?:while\b)/i,/^(?:do\b)/i,/^(?:if\b)/i,/^(?:else\b)/i,/^(?:break\b)/i,/^(?:continue\b)/i,/^(?:return\b)/i,/^(?:int\b)/i,/^(?:boolean\b)/i,/^(?:double\b)/i,/^(?:string\b)/i,/^(?:char\b)/i,/^(?:static\b)/i,/^(?:main\b)/i,/^(?:args\b)/i,/^(?:system\b)/i,/^(?:out\b)/i,/^(?:print\b)/i,/^(?:println\b)/i,/^(?:\{)/i,/^(?:\})/i,/^(?:\()/i,/^(?:\))/i,/^(?:,)/i,/^(?:;)/i,/^(?:\^)/i,/^(?:\*)/i,/^(?:\.)/i,/^(?:\[)/i,/^(?:\])/i,/^(?:>)/i,/^(?:>=)/i,/^(?:<)/i,/^(?:<=)/i,/^(?:=)/i,/^(?:==)/i,/^(?:!)/i,/^(?:!=)/i,/^(?:&&)/i,/^(?:\|\|)/i,/^(?:\+\+)/i,/^(?:\+)/i,/^(?:--)/i,/^(?:-)/i,/^(?:\/)/i,/^(?:"[^\"]*")/i,/^(?:“[^\“]*“)/i,/^(?:'[^\']*')/i,/^(?:‘[^\‘]*‘)/i,/^(?:\/\/.*)/i,/^(?:[/][*][^*]*[*]+([^/*][^*]*[*]+)*[/])/i,/^(?:[a-zA-Z]([a-zA-Z0-9_])*)/i,/^(?:$)/i,/^(?:[ \t\r\n\f])/i,/^(?:.)/i],
+conditions: {"INITIAL":{"rules":[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63],"inclusive":true}}
 });
 return lexer;
 })();

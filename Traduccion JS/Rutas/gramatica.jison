@@ -183,10 +183,16 @@ var traduccion = "";
 \"[^\"]*\"  {listaTokens.push({tipo: "tk_stringTexto", valor: yytext, 
                 fila: yylloc.first_line, columna: yylloc.first_column});
                 return "tk_stringTexto";}
+\“[^\“]*\“  {listaTokens.push({tipo: "tk_stringTexto", valor: yytext, 
+                fila: yylloc.first_line, columna: yylloc.first_column});
+                return "tk_stringTexto";}
 \'[^\']*\'  {listaTokens.push({tipo: "tk_charTexto", valor: yytext, 
                 fila: yylloc.first_line, columna: yylloc.first_column});
                 return "tk_charTexto";}
-
+\‘[^\‘]*\‘  {listaTokens.push({tipo: "tk_charTexto", valor: yytext, 
+                fila: yylloc.first_line, columna: yylloc.first_column});
+                return "tk_charTexto";}
+                
 /*expresiones para comentarios individuales y multiples*/
 "//".*                                  {yytext = yytext.substr(1, yylen-2);
                                         listaTokens.push({tipo: "tk_comentarioIndividual", 
