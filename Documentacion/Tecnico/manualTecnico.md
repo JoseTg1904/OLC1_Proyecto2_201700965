@@ -2,7 +2,7 @@
 
 ## *Autómata finito determinista*
 
-![AFD Java](Imagenes/AFD_Proyecto2.png)
+![AFD Java](AFD_Proyecto2.png)
 
 ## *Expresiones regulares en jison*
 ---
@@ -89,9 +89,20 @@
 
 ### Con recursividad por la izquierda
 ```
-V = { <Inicio>, <PublicoInterClas>, <InterClas>, <Definicion>, <Instrucciones>, <TipoFuncion>, <Parametros>, <Tipo>, <ListadoParametros>, <Implementacion>, <Declaracion>, <IdentificadorDeclaracion>, <ListadoDeclaracion>, <expresion>, <divTipoFuncion>, <interno>, <LlamadoAsignacion>, <divPrint>, <DeclaracionFor>, <internoCiclo>, <ifElse>, <tipoReturn>, <comprobacionElif>, <ParametrosLlamado>, <ListadoDeclaracionParametrosLlamado>, <divLlamadoAsignacion>, <DeclaracionFor>, <IdentificadorDeclaracionFor> }
+V = { <Inicio>, <PublicoInterClas>, <InterClas>, <Definicion>, <Instrucciones>, 
+<TipoFuncion>, <Parametros>, <Tipo>, <ListadoParametros>, <Implementacion>, 
+<Declaracion>, <IdentificadorDeclaracion>, <ListadoDeclaracion>, <expresion>, <divTipoFuncion>, 
+<interno>, <LlamadoAsignacion>, <divPrint>, <DeclaracionFor>, <internoCiclo>, 
+<ifElse>, <tipoReturn>, <comprobacionElif>, <ParametrosLlamado>, <ListadoDeclaracionParametrosLlamado>, <divLlamadoAsignacion>, <DeclaracionFor>, <IdentificadorDeclaracionFor> }
 
-T = { tk_public, tk_interface, tk_identificador, tk_class, "{", "}", "(", ")", ";", tk_void, tk_int, tk_boolean, tk_double, tk_string, tk_char, ",", "=", "+", "-", "*", "/", "<", ">", "<=", ">=", "==", "!=", "!", "&&", "||", "^", "++", "--",  tk_char, tk_entero, tk_decimal, tk_true, tk_false, tk_static, tk_void, tk_main, tk_stringFun, "[", "]", tk_args, tk_system, tk_out, ".", tk_for, tk_do, tk_while, tk_if, tk_return, tk_else, tk_print, tk_println, tk_break, tk_continue }
+T = { tk_public, tk_interface, tk_identificador, tk_class, "{", "}", "(", ")", 
+";", tk_void, tk_int, tk_boolean, tk_double, tk_string, tk_char, ",", 
+"=", "+", "-", "*", "/", "<", ">", "<=", 
+">=", "==", "!=", "!", "&&", "||", "^", "++", 
+"--",  tk_char, tk_entero, tk_decimal, tk_true, tk_false, tk_static, tk_void, 
+tk_main, tk_stringFun, "[", "]", tk_args, tk_system, tk_out, ".", 
+tk_for, tk_do, tk_while, tk_if, tk_return, tk_else, tk_print, tk_println, 
+tk_break, tk_continue }
 
 S = <Inicio>
 
@@ -200,9 +211,20 @@ P = {
 ### Sin recursividad por la izquierda
 
 ```
-V = { <Inicio>, <PublicoInterClas>, <InterClas>, <Definicion>, <Instrucciones>, <TipoFuncion>, <Parametros>, <Tipo>, <ListadoParametros>, <Implementacion>, <Declaracion>, <IdentificadorDeclaracion>, <ListadoDeclaracion>, <expresion>, <divTipoFuncion>, <interno>, <LlamadoAsignacion>, <divPrint>, <DeclaracionFor>, <internoCiclo>, <ifElse>, <tipoReturn>, <comprobacionElif>, <ParametrosLlamado>, <ListadoDeclaracionParametrosLlamado>, <divLlamadoAsignacion>, <DeclaracionFor>, <IdentificadorDeclaracionFor>, <expresionPrima> }
+V = { <Inicio>, <PublicoInterClas>, <InterClas>, <Definicion>, <Instrucciones>, 
+<TipoFuncion>, <Parametros>, <Tipo>, <ListadoParametros>, <Implementacion>, 
+<Declaracion>, <IdentificadorDeclaracion>, <ListadoDeclaracion>, <expresion>, <divTipoFuncion>, 
+<interno>, <LlamadoAsignacion>, <divPrint>, <DeclaracionFor>, <internoCiclo>, 
+<ifElse>, <tipoReturn>, <comprobacionElif>, <ParametrosLlamado>, <ListadoDeclaracionParametrosLlamado>, <divLlamadoAsignacion>, <DeclaracionFor>, <IdentificadorDeclaracionFor>, <expresionPrima> }
 
-T = { tk_public, tk_interface, tk_identificador, tk_class, "{", "}", "(", ")", ";", tk_void, tk_int, tk_boolean, tk_double, tk_string, tk_char, ",", "=", "+", "-", "*", "/", "<", ">", "<=", ">=", "==", "!=", "!", "&&", "||", "^", "++", "--",  tk_char, tk_entero, tk_decimal, tk_true, tk_false, tk_static, tk_void, tk_main, tk_stringFun, "[", "]", tk_args, tk_system, tk_out, ".", tk_for, tk_do, tk_while, tk_if, tk_return, tk_else, tk_print, tk_println, tk_break, tk_continue }
+T = { tk_public, tk_interface, tk_identificador, tk_class, "{", "}", "(", ")", 
+";", tk_void, tk_int, tk_boolean, tk_double, tk_string, tk_char, ",", 
+"=", "+", "-", "*", "/", "<", ">", "<=", 
+">=", "==", "!=", "!", "&&", "||", "^", "++", 
+"--",  tk_char, tk_entero, tk_decimal, tk_true, tk_false, tk_static, tk_void, 
+tk_main, tk_stringFun, "[", "]", tk_args, tk_system, tk_out, ".", 
+tk_for, tk_do, tk_while, tk_if, tk_return, tk_else, tk_print, tk_println, 
+tk_break, tk_continue }
 
 S = <Inicio>
 
