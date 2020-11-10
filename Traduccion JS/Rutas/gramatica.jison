@@ -253,7 +253,7 @@ InterClas
 Definicion 
         : tk_public TipoFuncionDef tk_identificador tk_parA ParametrosDef tk_parC tk_puntoComa Definicion {$$ = ""}
         | 
-        | error tk_puntoComa {listaErroresSintacticos.push({encontrado: yytext, 
+        | error {listaErroresSintacticos.push({encontrado: yytext, 
         esperado: "error en la definicion de metodos o funciones",
         fila: this._$.first_line, columna: this._$.first_column})};
 
@@ -302,7 +302,7 @@ Instrucciones
 
 Declaracion 
         : Tipo IdentificadorDeclaracion tk_puntoComa {$$ = "var " + $2 + $3 + "\n";}
-        | error tk_puntoComa {listaErroresSintacticos.push({encontrado: yytext, 
+        | error {listaErroresSintacticos.push({encontrado: yytext, 
         esperado: "error en la declaracion de variables",
         fila: this._$.first_line, columna: this._$.first_column})};
 
@@ -362,7 +362,10 @@ divTipoFuncion
 interno 
         : internoLlave {$$ = $1;}
         | internoPunto {$$ = $1;}
-        | {$$ = "";};
+        | {$$ = "";}
+        | error {listaErroresSintacticos.push({encontrado: yytext, 
+        esperado: "error en la definicion instrucciones",
+        fila: this._$.first_line, columna: this._$.first_column})};
 
 internoLlave
         : tk_for tk_parA DeclaracionFor tk_puntoComa expresion tk_puntoComa expresion tk_parC tk_llaveA internoCiclo tk_llaveC interno {$$ = $1 + $2 + $3 + $4 + " " + $5 + $6 + " " + $7 + $8 + $9 + "\n" + $10 + "\n" + $11 + "\n" + $12;}
@@ -374,10 +377,7 @@ internoPunto
         | tk_do tk_llaveA internoCiclo tk_llaveC tk_while tk_parA expresion tk_parC tk_puntoComa interno {$$ = $1 + $2 + "\n" + $3 + "\n" + $4 + $5 + $6 + $7 + $8 + $9 + "\n" + $10;}
         | Declaracion1 interno {$$ = $1 + $2;}
         | tk_system tk_punto tk_out tk_punto divPrint interno {$$ = $5 + $6;}
-        | LlamadoAsignacion interno {$$ = $1 + $2;}
-        | error tk_puntoComa {listaErroresSintacticos.push({encontrado: yytext, 
-        esperado: "error en la definicion de return o do while",
-        fila: this._$.first_line, columna: this._$.first_column})};
+        | LlamadoAsignacion interno {$$ = $1 + $2;};
 
 tipoReturn 
         : expresion {$$ = $1;}
